@@ -28,6 +28,7 @@ Each item is one JSON object on its own line:
 | `area`, `cuisine`, `price` (1–4) | food only |
 | `by` | `"Claude"` for suggestions Claude added rather than real bookings |
 | `options` | several choices for one slot (e.g. lunch spots): `[{title, ja, cuisine, area, address, price, notes}]`. Shown as one entry; the dropdown lists each with its own Map button. Set the item's `cuisine` to e.g. `"4 options"` |
+| `optionsLabel` | optional heading for the options list, e.g. `"Vegetarian-focused spots nearby"` (default: `"N options"`) |
 
 No date means it shows under "Ideas" (or the Food tab). Overlapping hotels are fine: the "Plans for" switch at the top filters by `who`, and the Everyone view uses the stay with the most people.
 
