@@ -217,6 +217,8 @@ body.modal-open{overflow:hidden}
 .kv dt{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-top:3px}
 .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .notes{white-space:pre-wrap}
+.notes p{margin:0}
+.notes p+p{margin-top:8px}
 .code{font-family:var(--font-mono);font-weight:600;letter-spacing:.06em;margin-right:8px;overflow-wrap:anywhere}
 .code.big{font-size:18px;margin:0}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -232,7 +234,13 @@ body.modal-open{overflow:hidden}
 .food-opts{list-style:none;margin:0;padding:0;display:grid;gap:3px;font-size:13.5px}
 .food-opts a{color:var(--accent);font-weight:500}
 .food-opts span{color:var(--muted)}
-@media (max-width:420px){.kv{grid-template-columns:1fr;gap:2px}.kv dd{margin-bottom:8px}}
+@media (max-width:560px){
+  .detail{padding:12px 14px}
+  .kv{grid-template-columns:minmax(0,1fr);gap:2px}
+  .kv dt{padding-top:0}
+  .kv dd{margin-bottom:10px}
+  .kv dd:last-child{margin-bottom:0}
+}
 
 .later{margin-top:8px}
 .quiet{color:var(--muted);font-size:14px;margin:10px 0 0}
@@ -969,7 +977,7 @@ function detailsHtml(it, kind){
   if (it.conf) rows.push([it.type === 'transit' ? 'Ticket' : 'Confirmation', codeHtml(it.conf)]);
   if (it.who) rows.push(['Who', esc(it.who)]);
   if (it.by) rows.push(['Recommended by', esc(it.by)]);
-  if (it.notes) rows.push(['Notes', '<span class="notes">' + esc(it.notes) + '</span>']);
+  if (it.notes) rows.push(['Notes', '<div class="notes">' + String(it.notes).split('\n').filter(l => l.trim()).map(l => '<p>' + esc(l) + '</p>').join('') + '</div>']);
   if (rows.length) out.push('<dl class="kv">' + rows.map(([k, v]) => '<dt>' + k + '</dt><dd>' + v + '</dd>').join('') + '</dl>');
   if (Array.isArray(it.options) && it.options.length) out.push(optionsHtml(it));
   const acts = linkButtons(it, kind);
