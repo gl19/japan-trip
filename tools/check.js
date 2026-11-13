@@ -29,6 +29,17 @@ const seat = raw.match(/seats?\b[^"\\]{0,40}?\b\d{1,2}[A-K]\b/i);
 if (seat) problems.push(`seat numbers are in the data ("${seat[0]}")`);
 const codeLike = raw.match(/\b(?=[A-Z0-9]*\d)(?=[A-Z0-9]*[A-Z])[A-Z0-9]{6,}\b|\b\d{8,}\b/g) || [];
 codeLike.forEach(c => problems.push(`"${c}" looks like a booking code or reference number`));
+(trip.items || []).forEach(it => {
+  if (!it.cost) return;
+  const names = (trip.travelers || []).map(n => n.toLowerCase());
+  if (!(Number(it.cost.total) > 0)) problems.push(`"${it.title}" has a cost without a total`);
+  if (it.cost.paidBy && !names.includes(String(it.cost.paidBy).toLowerCase())) problems.push(`"${it.title}" cost paidBy "${it.cost.paidBy}" is not a traveler`);
+  if (it.cost.shares){
+    Object.keys(it.cost.shares).forEach(n => { if (!names.includes(n.toLowerCase())) problems.push(`"${it.title}" cost share for "${n}" is not a traveler`); });
+    const sum = Object.values(it.cost.shares).reduce((t, v) => t + Number(v), 0);
+    if (Math.round(sum) !== Math.round(Number(it.cost.total))) problems.push(`"${it.title}" cost shares add up to ${sum}, not the total ${it.cost.total}`);
+  }
+});
 const ids = (trip.items || []).map(i => i.id);
 ids.filter((id, k) => ids.indexOf(id) !== k).forEach(id => problems.push(`duplicate item id "${id}"`));
 

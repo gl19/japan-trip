@@ -28,6 +28,7 @@ Each item is one JSON object on its own line:
 | `area`, `cuisine`, `price` (1–4) | food only |
 | `by` | `"Claude"` for suggestions Claude added rather than real bookings |
 | `options` | several choices for one slot (e.g. lunch spots): `[{title, ja, cuisine, area, address, price, notes}]`. Shown as one entry; the dropdown lists each with its own Map button. Set the item's `cuisine` to e.g. `"4 options"` |
+| `cost` | a shared expense, shown in the Costs tab with who owes whom: `{"total": 14800, "paidBy": "Danny", "shares": {"Xin": 2950, …}}` in yen, tax included. Shares must add up to the total; leave `shares` out to split evenly between `who` (or everyone). Never include receipt or card numbers |
 | `optionsLabel` | optional heading for the options list, e.g. `"Vegetarian-focused spots nearby"` (default: `"N options"`) |
 
 No date means it shows under "Ideas" (or the Food tab). Overlapping hotels are fine: the "Plans for" switch at the top filters by `who`, and the Everyone view uses the stay with the most people.

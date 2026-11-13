@@ -348,6 +348,35 @@ body.modal-open{overflow:hidden}
 }
 
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:60;width:max-content;max-width:min(460px, calc(100% - 32px));background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+/* Costs */
+.cost-total{margin:20px 0 0;color:var(--muted);font-size:14px}
+.cost-total b{color:var(--ink);font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.settle,.exp{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.settle li{display:flex;align-items:center;flex-wrap:wrap;gap:4px 8px;padding:12px 14px;background:var(--surface);border:1px solid var(--rule);border-radius:12px}
+.settle .arr{color:var(--muted)}
+.settle .amt{margin-left:auto;font-family:var(--font-mono);font-weight:600;font-variant-numeric:tabular-nums}
+.settle li.me,.exp li.me{border-color:var(--accent)}
+.bal{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--rule);border-radius:12px;overflow:hidden;font-size:14px}
+.bal th,.bal td{padding:9px 12px;text-align:right;border-top:1px solid var(--rule);font-variant-numeric:tabular-nums}
+.bal thead th{border-top:0;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bal th:first-child,.bal td:first-child{text-align:left}
+.bal td{font-family:var(--font-mono)}
+.bal td:first-child{font-family:var(--font-body);font-weight:600}
+.bal tr.me td{background:var(--surface-2)}
+.bal .pos{color:var(--accent);font-weight:600}
+.bal .neg{color:var(--warn);font-weight:600}
+.exp li{display:grid;gap:6px;padding:12px 14px;background:var(--surface);border:1px solid var(--rule);border-radius:12px}
+.exp-top{display:flex;align-items:baseline;gap:10px}
+.exp-when{font-family:var(--font-mono);font-size:12px;color:var(--muted);white-space:nowrap}
+.exp-title{flex:1;min-width:0;font-weight:600;overflow-wrap:anywhere}
+.exp-total{font-family:var(--font-mono);font-weight:600;font-variant-numeric:tabular-nums}
+.exp-sub{color:var(--muted);font-size:13.5px}
+.shares{display:flex;flex-wrap:wrap;gap:5px}
+.shares span{font-size:12.5px;padding:3px 9px;border-radius:999px;background:var(--surface-2);white-space:nowrap}
+.shares span.me{background:var(--accent);color:var(--on-accent)}
+.kv .shares{margin-top:6px}
+@media (max-width:400px){.bal th,.bal td{padding:8px 8px;font-size:13px}}
+
 /* Pull to refresh (Home Screen app only; Safari tabs have their own) */
 .ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top, 0px) + 8px);z-index:70;display:flex;align-items:center;gap:7px;padding:7px 14px 7px 11px;border-radius:999px;background:var(--surface);color:var(--muted);border:1px solid var(--rule);box-shadow:0 6px 18px rgba(0,0,0,.14);font-size:13px;font-weight:600;white-space:nowrap;opacity:0;transform:translate(-50%,-64px);pointer-events:none}
 .ptr.settle{transition:opacity .2s,transform .2s}
@@ -371,8 +400,8 @@ body.modal-open{overflow:hidden}
   {"id":"e-kix-arrival","type":"event","title":"Through Kansai Airport: immigration, bags, customs","city":"Osaka","address":"Kansai International Airport, Terminal 1","date":"2026-11-13","time":"16:45","endTime":"18:00","status":"open","by":"Claude","who":"Xin, Sheila, Rohan","notes":"Estimate: 60–90 minutes from landing to walking out, so plan on leaving the terminal around 18:00. It can be quicker or slower depending on how many long-haul flights land at the same time.\nFill in Visit Japan Web before you land and screenshot the QR codes. It saves time at immigration and customs.\nPick up a pocket Wi-Fi or SIM if you need one, and an ICOCA or Suica card if you want one, before heading to the train. Your Suica/ICOCA works on the Nankai line."},
   {"id":"t-kix","type":"transit","title":"Nankai train: Kansai Airport to Namba","from":"Kansai International Airport","to":"Nankai Namba Station","date":"2026-11-13","time":"18:15","endTime":"19:00","status":"open","by":"Claude","who":"Xin, Sheila, Rohan","notes":"Take the Nankai line from the airport station to Nankai Namba, about 40–45 minutes. Two choices: the regular Airport Express (no reservation, about 45 minutes) or the Rapi:t limited express (about 40 minutes, reserved seat with extra fare, and it has space for suitcases). Either works, so take whichever is leaving first.\nFollow the Nankai signs from the arrivals hall to the airport station (a short walk through the connecting building). Trains to Namba run about every 15–30 minutes."},
   {"id":"t-namba-hotel-walk","type":"transit","title":"Walk from Namba Station to the hotel","from":"Nankai Namba Station","to":"UH Suite Namba Station The Spa","date":"2026-11-13","time":"19:00","endTime":"19:20","status":"open","by":"Claude","who":"Xin, Sheila, Rohan","notes":"About 1 km, roughly a 15-minute walk, so you'll be at the hotel around 19:15–19:30. With big suitcases, a taxi from the station is the easy fallback. Check-in is open from 15:00, and the host's number is in Sheila's booking if you need to reach them."},
-  {"id":"f-fri13-dinner","type":"food","title":"Dinner near the hotel (pick one)","city":"Osaka","date":"2026-11-13","time":"20:00","status":"maybe","by":"Claude","area":"Namba and Motomachi","cuisine":"5 options","notes":"You should be at the hotel around 19:15–19:30 after the flight, so these are all places to reach in about 10–15 minutes and that stay open late. Listed from nearest to farthest, and the first one is on your way from the train. The vegetarian-friendly ones say so.","options":[{"title":"Itadakimasu","cuisine":"Japanese, meat and vegetable dishes","area":"One minute from Nankai Namba Station","notes":"On your way from the train, so you can eat before the walk to the hotel. Listed 11:00–23:00, last order 22:00. I couldn't confirm vegetarian options, so ask. From online listings, so check hours first.","ja":"肉と野菜の産直ダイニング ITADAKIMASU"},{"title":"Namba Parks restaurants","cuisine":"Casual restaurants, 6th floor","area":"Namba Parks, about a 10-minute walk from the hotel","notes":"Restaurants stay open until about 23:00, although the shops close at 9, and the casual places are on the 6th floor. I haven't picked a specific restaurant, so browse the floor. From online listings, so check hours first."},{"title":"Kura Sushi (Namba Parks South flagship)","cuisine":"Conveyor-belt sushi","area":"Namba Parks South, 2F, about a 10-minute walk from the hotel","notes":"Easy and quick when you're tired, with vegetarian plates (see the Kura Sushi note on the 15th). I don't have its closing time, so check before you go.","ja":"くら寿司 グローバル旗艦店 なんばパークスサウス"},{"title":"Kaisen Monjya Ebizo","cuisine":"Okonomiyaki and monjayaki","area":"Near Namba Station","notes":"Has vegan options, including a vegan okonomiyaki and edamame. Listed hours are 11:00–24:00 on Thursday to Sunday, so it's open on Friday until midnight. A bit further than the other options. From online listings, so check hours first."},{"title":"Gyozaoh (Dotonbori branch)","cuisine":"Vegan-friendly gyoza","area":"Dotonbori, about a 15-minute walk","notes":"Vegetarian-friendly, but one reviewer says it closes at 23:00, so go early if you pick it. From online listings, so check hours first."}]},
   {"id":"h-uh-namba","type":"hotel","title":"UH Suite Namba Station The Spa","city":"Osaka","address":"元町2-7-15 6, Osaka, Osaka Prefecture","date":"2026-11-13","time":"15:00","endDate":"2026-11-16","endTime":"11:00","status":"booked","who":"Sheila, Xin, Rohan, Danny, Nathan","notes":"Booked by Sheila. The host's phone number is in Sheila's booking."},
+  {"id":"f-genji-soba","type":"food","title":"Genji Soba","city":"Osaka","date":"2026-11-13","time":"19:43","status":"open","cuisine":"Soba and tempura","price":2,"notes":"First dinner in Osaka. Prices include tax.\nXin, Rohan and Nathan: tempura soba or cold tempura zaru soba, each with a large wild prawn (天婦羅そば / 天ざるそば 天然大海老), ¥2,950 each.\nDanny: duck nanban soba (鴨なんそば), ¥2,600.\nSheila: Genji soba (源氏そば), ¥1,650.\nDanny and Sheila split the tempura platter (天婦羅盛り合わせ, ¥1,700), ¥850 each.","cost":{"total":14800,"paidBy":"Danny","shares":{"Xin":2950,"Rohan":2950,"Nathan":2950,"Danny":3450,"Sheila":2500}}},
   {"id":"e-haircut-xin","type":"event","title":"Xin's haircut","city":"Osaka","address":"YUjin Central, Shinsaibashi Fukuho Bldg 3F, 2-6-9 Shinsaibashisuji, Chuo-ku, Osaka 542-0085 (〒542-0085 大阪市中央区心斎橋筋2-6-9 心斎橋福穂ビル 3F)","date":"2026-11-15","time":"14:30","endTime":"15:30","status":"booked","who":"Xin, Sheila","notes":"Haircut for Xin; Sheila is coming along.\nThe calendar invite is in Pacific time (Sat 14 Nov, 9:30–10:30 pm), which is Sun 15 Nov, 14:30–15:30 in Osaka."},
   {"id":"h-richmond-kyoto","type":"hotel","title":"Richmond Hotel Premier Kyoto Ekimae","ja":"リッチモンドホテルプレミア京都駅前","city":"Kyoto","address":"565-3 Kita Fudondo-cho, Shimogyo-ku, Kyoto 600-8233","date":"2026-11-16","time":"14:00","endDate":"2026-11-19","endTime":"11:00","status":"booked","notes":"Booked by Xin through the Bilt Travel Portal. 2 Standard Triple rooms for 5 guests. Non-refundable.\nHotel phone: +81 75-354-3677","who":"Xin, Sheila, Rohan, Danny, Nathan"},
   {"id":"t-osaka-kyoto","type":"transit","title":"Namba to Kyoto (metro and JR)","from":"UH Suite Namba Station The Spa","to":"Richmond Hotel Premier Kyoto Ekimae","date":"2026-11-16","time":"11:15","endTime":"12:30","status":"open","by":"Claude","notes":"Check out by 11:00. A simple route is the Midosuji Line from Namba to Umeda (Osaka Station), about 15 minutes, then the JR Special Rapid to Kyoto, about 30 minutes. The Directions button shows the live options. Your hotel is by Kyoto Station. Check-in opens at 14:00, but you can ask the front desk to hold your bags until then, so you can go out for lunch right away."},
@@ -848,7 +877,7 @@ function tabsHtml(){
   const todoN = visibleItems().filter(i => i.status === 'tobook').length;
   const tab = (id, label, count, warn) => '<button type="button" class="tab" role="tab" id="tab-' + id + '" aria-selected="' + (ui.tab === id) + '" aria-controls="view" data-tab="' + id + '">' + label
     + (count ? '<span class="count' + (warn ? ' warn' : '') + '">' + count + (warn ? '<span class="sr"> still to book</span>' : '') + '</span>' : '') + '</button>';
-  return '<div class="tabs"><div class="tablist" role="tablist" aria-label="Views">' + tab('schedule', 'Schedule') + tab('bookings', 'Bookings', todoN, true) + tab('food', 'Food', foodN) + '</div>'
+  return '<div class="tabs"><div class="tablist" role="tablist" aria-label="Views">' + tab('schedule', 'Schedule') + tab('bookings', 'Bookings', todoN, true) + tab('food', 'Food', foodN) + tab('costs', 'Costs') + '</div>'
     + '<span class="spacer"></span>'
     + (ui.canEdit ? '<button type="button" class="btn primary" data-add>' + icon('plus') + 'Add</button>' : '')
     + '</div>';
@@ -860,6 +889,7 @@ function footHtml(){
 function viewHtml(){
   if (ui.tab === 'bookings') return viewBookings();
   if (ui.tab === 'food') return viewFood();
+  if (ui.tab === 'costs') return viewCosts();
   return viewSchedule();
 }
 function emptyHtml(title, text){
@@ -985,6 +1015,10 @@ function detailsHtml(it, kind){
   if (it.conf) rows.push([it.type === 'transit' ? 'Ticket' : 'Confirmation', codeHtml(it.conf)]);
   if (it.who) rows.push(['Who', esc(it.who)]);
   if (it.by) rows.push(['Recommended by', esc(it.by)]);
+  if (hasCost(it)){
+    const payer = canonPerson(it.cost.paidBy) || String(it.cost.paidBy || '');
+    rows.push(['Cost', esc(yen(it.cost.total)) + (payer ? ', paid by ' + esc(payer) : '') + '<div class="shares">' + costShares(it).map(([n, v]) => '<span' + (ui.viewer && n === ui.viewer ? ' class="me"' : '') + '>' + esc(n) + ' ' + esc(yen(v)) + '</span>').join('') + '</div>']);
+  }
   if (it.notes) rows.push(['Notes', '<div class="notes">' + String(it.notes).split('\n').filter(l => l.trim()).map(l => '<p>' + esc(l) + '</p>').join('') + '</div>']);
   if (rows.length) out.push('<dl class="kv">' + rows.map(([k, v]) => '<dt>' + k + '</dt><dd>' + v + '</dd>').join('') + '</dl>');
   if (Array.isArray(it.options) && it.options.length) out.push(optionsHtml(it));
@@ -1393,8 +1427,65 @@ function copyText(text, btn){
   } catch(e){ fallback(); }
 }
 
+/* Costs: shared expenses and who owes whom. Each item can carry cost: {total, paidBy, shares: {Name: yen}}; without shares it splits evenly between who (or everyone). */
+function yen(n){ return '¥' + Math.round(Number(n) || 0).toLocaleString('en-US'); }
+function hasCost(it){ return !!(it && it.cost && typeof it.cost === 'object' && Number(it.cost.total) > 0); }
+function costShares(it){
+  const s = it.cost.shares;
+  if (s && typeof s === 'object') return Object.keys(s).map(n => [canonPerson(n) || n, Number(s[n]) || 0]);
+  const names = whoNames(it).length ? whoNames(it) : travelersList();
+  return names.map(n => [canonPerson(n) || n, Number(it.cost.total) / names.length]);
+}
+function costBalances(list){
+  const bal = {};
+  travelersList().forEach(p => { bal[p] = { paid: 0, share: 0 }; });
+  for (const it of list){
+    const payer = canonPerson(it.cost.paidBy);
+    if (payer) bal[payer].paid += Number(it.cost.total);
+    for (const [n, v] of costShares(it)) if (bal[n]) bal[n].share += v;
+  }
+  return bal;
+}
+function settleUp(bal){
+  const net = Object.keys(bal).map(p => ({ p, v: Math.round(bal[p].paid - bal[p].share) }));
+  const cred = net.filter(x => x.v > 0).sort((a, b) => b.v - a.v), debt = net.filter(x => x.v < 0).map(x => ({ p: x.p, v: -x.v })).sort((a, b) => b.v - a.v);
+  const out = [];
+  let i = 0, j = 0;
+  while (i < debt.length && j < cred.length){
+    const amt = Math.min(debt[i].v, cred[j].v);
+    if (amt > 0) out.push({ from: debt[i].p, to: cred[j].p, amt });
+    debt[i].v -= amt; cred[j].v -= amt;
+    if (debt[i].v <= 0) i++;
+    if (cred[j].v <= 0) j++;
+  }
+  return out;
+}
+function viewCosts(){
+  const list = trip.items.filter(hasCost).sort(byWhen);
+  if (!list.length) return emptyHtml('No shared costs yet', 'Send Claude a receipt and say who had what. It will show up here with who owes whom.');
+  const bal = costBalances(list), v = ui.viewer;
+  const total = list.reduce((t, it) => t + Number(it.cost.total), 0);
+  const pays = settleUp(bal);
+  const signed = n => { const r = Math.round(n); return r > 0 ? '<span class="pos">+' + yen(r) + '</span>' : r < 0 ? '<span class="neg">−' + yen(-r) + '</span>' : '0'; };
+  let h = '<p class="cost-total">' + list.length + ' shared ' + (list.length === 1 ? 'cost' : 'costs') + ', <b>' + yen(total) + '</b> in all. Prices include tax.</p>';
+  h += sectionH('Settle up', pays.length || null);
+  h += pays.length ? '<ul class="settle">' + pays.map(x => '<li' + (v && (x.from === v || x.to === v) ? ' class="me"' : '') + '><b>' + esc(x.from) + '</b><span class="arr">pays</span><b>' + esc(x.to) + '</b><span class="amt">' + yen(x.amt) + '</span></li>').join('') + '</ul>' : '<p class="quiet">Everyone is square.</p>';
+  h += sectionH('Balances') + '<table class="bal"><thead><tr><th scope="col">Who</th><th scope="col">Spent</th><th scope="col">Paid</th><th scope="col">Balance</th></tr></thead><tbody>'
+    + Object.keys(bal).map(p => '<tr' + (v === p ? ' class="me"' : '') + '><td>' + esc(p) + '</td><td>' + yen(bal[p].share) + '</td><td>' + yen(bal[p].paid) + '</td><td>' + signed(bal[p].paid - bal[p].share) + '</td></tr>').join('')
+    + '</tbody></table><p class="quiet">Spent is each person\'s share. Plus means they get money back; minus means they owe.</p>';
+  h += sectionH('Costs', list.length) + '<ul class="exp">' + list.map(it => {
+    const payer = canonPerson(it.cost.paidBy) || String(it.cost.paidBy || '');
+    const shares = costShares(it);
+    const mine = v && shares.some(([n]) => n === v);
+    return '<li' + (mine ? ' class="me"' : '') + '><div class="exp-top"><span class="exp-when">' + esc(validD(it.date) ? fmtDay(it.date) : 'No date') + '</span><span class="exp-title">' + esc(it.title) + '</span><span class="exp-total">' + yen(it.cost.total) + '</span></div>'
+      + (payer ? '<span class="exp-sub">Paid by ' + esc(payer) + '</span>' : '')
+      + '<div class="shares">' + shares.map(([n, a]) => '<span' + (v && n === v ? ' class="me"' : '') + '>' + esc(n) + ' ' + yen(a) + '</span>').join('') + '</div></li>';
+  }).join('') + '</ul>';
+  return h;
+}
+
 /* ---------- navigation ---------- */
-const TAB_IDS = ['schedule', 'bookings', 'food'];
+const TAB_IDS = ['schedule', 'bookings', 'food', 'costs'];
 function tabFromHash(){ const h = (location.hash || '').replace('#', ''); return TAB_IDS.includes(h) ? h : ''; }
 function setTab(t){
   if (!TAB_IDS.includes(t)) return;
