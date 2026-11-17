@@ -349,12 +349,47 @@ body.modal-open{overflow:hidden}
 
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:60;width:max-content;max-width:min(460px, calc(100% - 32px));background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 /* Weather */
-.wx{display:flex;align-items:center;flex-wrap:wrap;gap:2px 10px;margin-top:6px;font-size:13.5px;color:var(--muted)}
-.wx[hidden]{display:none}
-.wx .wx-i{font-size:19px;line-height:1}
+.wxwrap{margin-top:8px}
+.wxwrap[hidden]{display:none}
+.wx{appearance:none;display:flex;align-items:center;flex-wrap:wrap;gap:2px 10px;width:100%;margin:0;padding:8px 10px 8px 12px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);color:var(--muted);font:inherit;font-size:13.5px;text-align:left;cursor:pointer}
+.wx:hover{border-color:var(--muted)}
+.wx:focus-visible{outline:2px solid var(--accent);outline-offset:0}
+.wx .wx-i{font-size:20px;line-height:1}
 .wx b{color:var(--ink);font-weight:600}
 .wx .f{opacity:.8}
 .wx .rain{color:var(--accent);font-weight:600}
+.wx .more{margin-left:auto;display:inline-flex;align-items:center;gap:3px;color:var(--accent);font-weight:600;font-size:12.5px;white-space:nowrap}
+.wx .more svg{width:16px;height:16px;transition:transform .15s}
+.wx[aria-expanded="true"] .more svg{transform:rotate(180deg)}
+.wxd{margin-top:6px;padding:12px 12px 4px;border:1px solid var(--rule);border-radius:12px;background:var(--surface)}
+.wxd[hidden]{display:none}
+.wx-sum{margin:0 0 10px;font-weight:600;line-height:1.4}
+.wx-hours{display:flex;gap:6px;overflow-x:auto;margin:0 -2px 12px;padding:2px 2px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.wx-h{flex:none;width:58px;display:grid;justify-items:center;gap:2px;padding:8px 2px;border:1px solid var(--rule);border-radius:10px;background:var(--bg);scroll-snap-align:start;font-size:12.5px}
+.wx-h .hr{font-family:var(--font-mono);font-size:11.5px;color:var(--muted)}
+.wx-h .ic{font-size:20px;line-height:1.2;width:auto;height:auto;background:none;border-radius:0;display:block}
+.wx-h .t{font-weight:600;font-size:14px}
+.wx-h .tf{color:var(--muted);font-size:11px}
+.wx-h .pr{color:var(--accent);font-weight:600;font-size:12px;min-height:1.2em}
+.wx-h.past{opacity:.5}
+.wx-h.now{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.wx-h.now .hr{color:var(--accent);font-weight:600}
+.wx-facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;margin:0 0 12px}
+.wx-facts div{min-width:0}
+.wx-facts dt{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.wx-facts dd{margin:1px 0 0;font-size:14px}
+.wx-tip{margin:0 0 10px;padding:9px 11px;border-radius:10px;background:var(--surface-2);font-size:13.5px;line-height:1.45}
+.wx-note{margin:0 0 10px;color:var(--muted);font-size:12px}
+
+/* Day map */
+.daymap{display:flex;align-items:center;flex-wrap:wrap;gap:2px 10px;width:100%;margin-top:6px;padding:8px 10px 8px 12px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);color:var(--muted);font-size:13.5px;text-decoration:none}
+.daymap:hover{border-color:var(--muted)}
+.daymap:focus-visible{outline:2px solid var(--accent);outline-offset:0}
+.daymap svg{width:18px;height:18px;flex:none;color:var(--ink)}
+.daymap b{color:var(--ink);font-weight:600}
+.daymap .more{margin-left:auto;display:inline-flex;align-items:center;gap:3px;color:var(--accent);font-weight:600;font-size:12.5px;white-space:nowrap}
+.daymap .more svg{width:14px;height:14px;color:inherit}
+.daymaps{display:grid;gap:0}
 
 /* Now / next */
 .entry{scroll-margin-top:90px}
@@ -445,9 +480,10 @@ body.modal-open{overflow:hidden}
   {"id":"t-kyoto-nara","type":"transit","title":"Kyoto to Nara (Kintetsu line)","from":"Richmond Hotel Premier Kyoto Ekimae","to":"Tōdai-ji, Nara","date":"2026-11-17","time":"08:45","endTime":"10:00","status":"open","by":"Claude","who":"Danny, Xin, Sheila, Nathan, Rohan","notes":"Leave the hotel by about 8:45. Allow 10–15 minutes to reach the Kintetsu platforms, which are on the south (Hachijō) side of Kyoto Station.\nKintetsu Kyoto Line to Kintetsu-Nara: about 35 minutes on a Limited Express (needs an extra reserved-seat ticket), or about 45 minutes on an Express. Check whether your Express runs through to Kintetsu-Nara or needs a change at Yamato-Saidaiji. Suica or ICOCA covers the base fare.\nFrom Kintetsu-Nara it's a 15–20 minute walk through Nara Park to Tōdai-ji, and the deer start right by the station."},
   {"id":"e-nara-todaiji","type":"event","title":"Nara deer feeding + Tōdai-ji Temple","ja":"奈良公園・東大寺","city":"Nara","address":"Tōdai-ji, 406-1 Zōshichō, Nara 630-8587","date":"2026-11-17","time":"10:00","endTime":"12:15","status":"open","who":"Danny, Xin, Sheila, Nathan, Rohan","notes":"Day trip from Kyoto; see the Kintetsu train entry just before this.\nDeer crackers (shika senbei) are sold from carts around the park.\nGetting back: today you stop in Uji on the way (see the JR Nara Line entry after lunch). If you'd rather skip Uji, the Kintetsu line from Kintetsu-Nara to Kyoto takes about 35–45 minutes."},
   {"id":"t-nara-uji","type":"transit","title":"Nara to Uji (JR Nara Line)","from":"JR Nara Station, Nara","to":"JR Uji Station, Uji, Kyoto","date":"2026-11-17","time":"12:30","endTime":"13:10","status":"open","by":"Claude","notes":"Walk from the Tōdai-ji area to JR Nara Station (about 10–15 minutes), then the JR Nara Line to Uji, about 40 minutes. You took the 12:30 train. This is the JR line, not Kintetsu, which doesn't serve Uji."},
-  {"id":"f-uji-lunch","type":"food","title":"Renge Chaya","city":"Kyoto","area":"Uji, next to Byōdō-in at the start of the tea street","date":"2026-11-17","time":"13:00","endTime":"14:00","status":"open","link":"https://maps.app.goo.gl/ThA1mKQVQ7BjVGRZ9","notes":"Lunch in Uji after the train from Nara. A two-storey traditional Japanese restaurant right by Byōdō-in, at the start of the shopping street. Its menu is mostly soba, udon, tempura and eel (unagi).\nFrom online listings: reviewers say it may be cash only, so bring cash, and it's listed as open 11:00–16:00. The Link button opens it on Google Maps.","cuisine":"Soba, udon and tempura"},
+  {"id":"f-uji-lunch","type":"food","title":"Renge Chaya","city":"Kyoto","area":"Uji","date":"2026-11-17","time":"13:00","endTime":"14:00","status":"open","link":"https://maps.app.goo.gl/ThA1mKQVQ7BjVGRZ9","notes":"Lunch in Uji after the train from Nara. A two-storey traditional Japanese restaurant right by Byōdō-in, at the start of the shopping street. Its menu is mostly soba, udon, tempura and eel (unagi).\nFrom online listings: reviewers say it may be cash only, so bring cash, and it's listed as open 11:00–16:00. The Link button opens it on Google Maps.","cuisine":"Soba, udon and tempura"},
+  {"id":"e-horii-shichimeien","type":"event","title":"Horii Shichimeien (tea shop)","ja":"堀井七茗園","city":"Kyoto","address":"84 Uji Myoraku, Uji, Kyoto 611-0021","date":"2026-11-17","time":"14:00","endTime":"14:50","status":"open","notes":"First stop after lunch, near the Byōdō-in end of the street. A long-established Uji tea shop, good for buying matcha and tea to take home. The official site lists shop hours 08:30–17:30; confirm before you rely on that.\nTake cash, since smaller shops may not take cards. Next is Nakamura Tokichi, a short walk down the street toward the station."},
+  {"id":"e-nakamura-tokichi","type":"event","title":"Nakamura Tokichi Honten, Uji main store","ja":"中村藤吉本店 宇治本店","city":"Kyoto","address":"10 Uji Ichiban, Uji, Kyoto 611-0021","date":"2026-11-17","time":"14:50","endTime":"15:40","status":"open","notes":"Uji's famous matcha café and tea shop, about a 1-minute walk from JR Uji Station. The matcha parfaits and sweets are what people queue for. Phone: 0774-22-7800.\nThere's usually a line, so put your name down as soon as you arrive. Hours differ between listings (about 10:00 to 17:00 or 17:30, with café last orders around 16:30), so confirm at tokichi.jp or by phone.\nIf the line is long, the tea shop counter (matcha and tea to take home) is quicker than the café.\nPlan to be back at Byōdō-in by about 15:50 for the Phoenix Hall interior tour, a 10–15 minute walk up the street.\nVegetarian: matcha sweets and tea are usually vegetarian, but check anything with a savoury filling."},
   {"id":"e-byodoin","type":"event","title":"Byōdō-in Temple and Phoenix Hall","ja":"平等院 鳳凰堂","city":"Kyoto","address":"116 Uji Renge, Uji, Kyoto 611-0021","date":"2026-11-17","time":"15:50","endTime":"16:55","status":"open","by":"Claude","notes":"A 10-minute walk from JR Uji Station. The Phoenix Hall (1053) sits on a pond and is the building on the ¥10 coin, with a pair of phoenix statues on the roof. Walk the grounds, see it reflected in the pond, and look at the Hōshōkan museum next door (bells and bodhisattva statues from the hall). Autumn leaves are around the pond.\nThe interior tour is timed, about 20 minutes, and costs extra (roughly ¥300, plus about ¥700 admission; I haven't confirmed this year's prices). Tickets are sold at a counter on the day and the last tour is about 16:10, so go to the counter first, right when you arrive.\nThe grounds usually close around 17:15–17:30. Check Byōdō-in's official site for this month's hours.\nThis comes after the tea shops, a 10-minute walk back up the street from them. Go to the ticket counter first thing, by about 16:00, since the last interior tour is about 16:10; the grounds stay open a bit later."},
-  {"id":"e-uji-tea-street","type":"event","title":"Uji tea street and matcha shops (Omotesando)","ja":"宇治茶 表参道","city":"Kyoto","address":"Omotesando, Uji, Kyoto (between Byōdō-in and Uji Bridge)","date":"2026-11-17","time":"14:00","endTime":"15:40","status":"open","by":"Claude","notes":"The shops come first because they close earliest. The tea-shop street runs from Byōdō-in's gate down to the river, so after lunch walk down it, browsing as you go. Uji is Japan's most famous matcha town: matcha soft serve, matcha sweets and tea to take home. Famous names include Tsuen Tea, said to be the oldest tea shop in Japan, by the bridge, and the Nakamura Tokichi main shop, which often has a line. I haven't confirmed their hours.\nMany shops close around 17:00, and cafés take last orders around 16:30, so you have time but not forever. Take cash, since smaller shops may not take cards.\nPlan to walk back up to Byōdō-in by about 15:50 if you want the Phoenix Hall interior tour.\nVegetarian: matcha sweets and tea are usually vegetarian, but check anything with a savoury filling."},
   {"id":"e-uji-bridge","type":"event","title":"Uji Bridge and Uji River","ja":"宇治橋・宇治川","city":"Kyoto","address":"Uji Bridge, Uji, Kyoto 611-0021","date":"2026-11-17","time":"17:00","endTime":"17:20","status":"open","by":"Claude","notes":"One of Japan's oldest bridge sites, said to date back to 646, with the river running below it. The Tale of Genji is partly set in Uji, so there are Genji statues and a museum nearby. Walk onto the bridge and along the river for the view of the Uji River and the hills in the evening light. Sunset is about 16:50, so this is a nice last stop. It's open any time and takes about 15–20 minutes.\nJR Uji Station is about a 5-minute walk from the bridge."},
   {"id":"t-uji-kyoto","type":"transit","title":"Uji to Kyoto (JR Nara Line)","from":"JR Uji Station, Uji, Kyoto","to":"Richmond Hotel Premier Kyoto Ekimae","date":"2026-11-17","time":"17:25","endTime":"17:50","status":"open","by":"Claude","notes":"About 5 minutes' walk from the bridge to JR Uji Station, then the JR Nara Line to Kyoto Station, about 20 minutes. The hotel is by Kyoto Station. Suica or ICOCA works."},
   {"id":"t-kyoto-ishiyama","type":"transit","title":"Kyoto to Ishiyama Station (JR)","from":"Richmond Hotel Premier Kyoto Ekimae","to":"JR Ishiyama Station, Otsu","date":"2026-11-18","time":"08:00","endTime":"08:30","status":"open","by":"Claude","who":"Xin, Sheila","notes":"JR Biwako Line from Kyoto to Ishiyama takes about 15 minutes on a Special Rapid or Rapid train, and Suica or ICOCA works. Leaving the hotel by 8:00 gets you to the North Gate by 8:30 for the 8:40 shuttle."},
@@ -578,6 +614,7 @@ const ICONS = {
   trash: SVG_S + '<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg>',
   close: SVG_S + '<path d="M6 6l12 12M18 6L6 18"/></svg>',
   info: SVG_S + '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+  chev: SVG_S + '<path d="M6 9l6 6 6-6"/></svg>',
   refresh: SVG_S + '<path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>'
 };
 const icon = n => ICONS[n] || '';
@@ -699,7 +736,7 @@ try { trip = JSON.parse(document.getElementById('trip-data').textContent); } cat
 if (!trip || typeof trip !== 'object') trip = { name: 'Japan trip', start: '', end: '', items: [] };
 if (!Array.isArray(trip.items)) trip.items = [];
 
-const ui = { tab: 'schedule', foodCity: 'all', viewer: '', open: new Set(), canEdit: false, readOnly: false, saving: false };
+const ui = { wxOpen: new Set(), tab: 'schedule', foodCity: 'all', viewer: '', open: new Set(), canEdit: false, readOnly: false, saving: false };
 let artifactApi = null;
 let cur = { days: [], legs: [], colors: {} };
 
@@ -1015,7 +1052,8 @@ function dayHtml(d, leg, today){
     + '<div class="day-body"><div class="day-head"><h3>' + esc(fmtDay(d.date)) + '</h3><span class="day-ja" lang="ja">' + esc(fmtDayJa(d.date)) + '</span>'
     + (d.from ? '<span class="travel">' + esc(d.from) + ' → ' + esc(d.city) + '</span>' : '')
     + (isToday ? '<span class="chip today">Today</span>' : '') + '</div>'
-    + '<div class="wx" data-d="' + esc(d.date) + '" data-c="' + esc(d.city || '') + '"' + (wxHtml(d.date, d.city) ? '>' + wxHtml(d.date, d.city) : ' hidden>') + '</div>'
+    + '<div class="wxwrap" data-d="' + esc(d.date) + '" data-c="' + esc(d.city || '') + '"' + (wxBlock(d.date, d.city) ? '>' + wxBlock(d.date, d.city) : ' hidden>') + '</div>'
+    + dayMapHtml(d)
     + (d.night && !hasCheckin ? '<div class="tonight">' + icon('hotel') + '<span>Tonight: ' + esc(d.night.title) + '</span></div>' : '')
     + (d.entries.length ? '<ul class="entries">' + d.entries.map(e => entryHtml(e, d.date)).join('') + '</ul>' : '<p class="free">Nothing planned yet.</p>')
     + '</div></section>';
@@ -1556,50 +1594,145 @@ function viewCosts(){
   return h;
 }
 
-/* Weather: a forecast from Open-Meteo (free, no key) for each day's city, cached in the browser. Days past the 16-day forecast show nothing. */
-const WX_KEY = 'jptrip-wx';
+/* Weather: a forecast from Open-Meteo (free, no key) for each day's city, cached in the browser. Days past the 16-day forecast show nothing. Tap a day's weather for the hourly view. */
+const WX_KEY = 'jptrip-wx', WX_VER = 2;
 const WX_PLACES = { tokyo:[35.68,139.76], kyoto:[35.01,135.77], osaka:[34.69,135.50], hakone:[35.25,139.02], nara:[34.69,135.80], sendai:[38.27,140.87], hiroshima:[34.39,132.46], kanazawa:[36.56,136.66], nikko:[36.75,139.60], kamakura:[35.32,139.55], sapporo:[43.06,141.35], fukuoka:[33.59,130.40], okinawa:[26.21,127.68] };
 const WX_CODES = {};
 [[[0],'☀️','Clear'],[[1],'🌤️','Mostly clear'],[[2],'⛅','Partly cloudy'],[[3],'☁️','Overcast'],[[45,48],'🌫️','Fog'],[[51,53,55],'🌦️','Drizzle'],[[56,57],'🌧️','Freezing drizzle'],[[61],'🌦️','Light rain'],[[63],'🌧️','Rain'],[[65],'🌧️','Heavy rain'],[[66,67],'🌧️','Freezing rain'],[[71],'🌨️','Light snow'],[[73,77],'🌨️','Snow'],[[75],'❄️','Heavy snow'],[[80],'🌦️','Light showers'],[[81],'🌧️','Showers'],[[82],'⛈️','Heavy showers'],[[85],'🌨️','Snow showers'],[[86],'❄️','Heavy snow showers'],[[95],'⛈️','Thunderstorm'],[[96,99],'⛈️','Thunderstorm with hail']].forEach(([codes, e, l]) => codes.forEach(c => { WX_CODES[c] = [e, l]; }));
 let wx = null, wxAt = 0, wxNote = '';
 function wxStatus(t){ wxNote = t; const el = document.getElementById('wx-status'); if (el) el.textContent = t; }
 function wxCity(c){ return String(c || '').trim().toLowerCase(); }
-function wxHtml(date, city){
-  const d = wx && wx[wxCity(city)] && wx[wxCity(city)][date];
-  if (!d || typeof d.hi !== 'number' || typeof d.lo !== 'number') return '';
-  const [e, label] = WX_CODES[d.c] || ['🌡️', 'Weather'];
-  const f = c => Math.round(c * 9 / 5 + 32);
-  const lo = Math.round(d.lo), hi = Math.round(d.hi);
-  return '<span class="wx-i" aria-hidden="true">' + e + '</span><b>' + esc(label) + '</b>'
-    + '<span>' + lo + '–' + hi + '°C <span class="f">(' + f(d.lo) + '–' + f(d.hi) + '°F)</span></span>'
-    + (typeof d.p === 'number' && d.p >= 30 ? '<span class="rain">' + Math.round(d.p) + '% rain</span>' : '');
+const wxF = c => Math.round(c * 9 / 5 + 32);
+const wxNum = v => typeof v === 'number' && isFinite(v);
+function wxRange(a, b){ const lo = Math.round(a), hi = Math.round(b); return lo === hi ? lo + '°C (' + wxF(a) + '°F)' : lo + '–' + hi + '°C (' + wxF(a) + '–' + wxF(b) + '°F)'; }
+function wxDay(date, city){ return wx && wx[wxCity(city)] && wx[wxCity(city)][date] || null; }
+function wxSummary(d){
+  const hrs = d.h || [], wet = hrs.filter(h => wxNum(h[3]) && h[3] >= 50);
+  let t;
+  if (wet.length){ const a = wet[0][0], b = wet[wet.length - 1][0] + 1; t = 'Rain is most likely ' + (a === b - 1 ? 'around ' + String(a).padStart(2, '0') + ':00' : 'between ' + String(a).padStart(2, '0') + ':00 and ' + String(b).padStart(2, '0') + ':00') + '.'; }
+  else if (wxNum(d.p) && d.p >= 30) t = 'A chance of rain, but no hour is more likely than not.';
+  else t = 'Mostly dry.';
+  const w = (WX_CODES[d.c] || [, 'Weather'])[1];
+  return w + ' overall. ' + t;
+}
+function wxTips(d){
+  const tips = [];
+  if ((wxNum(d.p) && d.p >= 50) || (wxNum(d.mm) && d.mm >= 2)) tips.push('Take an umbrella or rain jacket.');
+  else if (wxNum(d.p) && d.p >= 30) tips.push('A small umbrella is a good idea.');
+  if (d.hi <= 10) tips.push('Cold: a warm coat, scarf and gloves.');
+  else if (d.hi <= 15) tips.push('Cool: a warm jacket.');
+  else if (d.hi <= 21) tips.push('Mild: a light jacket.');
+  else tips.push('Warm: light clothes.');
+  if (d.hi - d.lo >= 9) tips.push('The temperature swings a lot between morning and afternoon, so wear layers.');
+  if (wxNum(d.w) && d.w >= 30) tips.push('Windy, so hold onto hats and umbrellas.');
+  return tips.join(' ');
+}
+function uvLabel(u){ return u < 3 ? 'low' : u < 6 ? 'moderate' : u < 8 ? 'high' : 'very high'; }
+function wxDetail(date, d){
+  const hrs = d.h || [], today = localNow(), nowH = date === today.date ? Number(today.time.slice(0, 2)) : -1;
+  let h = '<p class="wx-sum">' + esc(wxSummary(d)) + '</p>';
+  if (hrs.length){
+    h += '<div class="wx-hours" role="list" tabindex="0" aria-label="Hour by hour forecast">' + hrs.map(x => {
+      const [e, l] = WX_CODES[x[2]] || ['🌡️', 'Weather'], cls = nowH >= 0 && x[0] < nowH ? ' past' : x[0] === nowH ? ' now' : '';
+      return '<div class="wx-h' + cls + '" role="listitem" aria-label="' + esc(String(x[0]).padStart(2, '0') + ':00, ' + l + ', ' + Math.round(x[1]) + ' degrees' + (wxNum(x[3]) ? ', ' + Math.round(x[3]) + ' percent chance of rain' : '')) + '">'
+        + '<span class="hr">' + (x[0] === nowH ? 'Now' : String(x[0]).padStart(2, '0') + ':00') + '</span><span class="ic" aria-hidden="true">' + e + '</span>'
+        + '<span class="t">' + Math.round(x[1]) + '°</span><span class="tf">' + wxF(x[1]) + '°F</span><span class="pr">' + (wxNum(x[3]) && x[3] >= 10 ? Math.round(x[3]) + '%' : '') + '</span></div>';
+    }).join('') + '</div>';
+  }
+  const f = [];
+  if (wxNum(d.fh) && wxNum(d.fl)) f.push(['Feels like', wxRange(d.fl, d.fh)]);
+  if (d.sr && d.ss) f.push(['Sunrise · sunset', esc(d.sr + ' · ' + d.ss)]);
+  if (wxNum(d.w)) f.push(['Wind', 'up to ' + Math.round(d.w) + ' km/h (' + Math.round(d.w * 0.621) + ' mph)']);
+  if (wxNum(d.mm)) f.push(['Rain total', d.mm < 0.1 ? 'none' : (Math.round(d.mm * 10) / 10) + ' mm']);
+  if (wxNum(d.uv)) f.push(['UV index', Math.round(d.uv) + ' (' + uvLabel(d.uv) + ')']);
+  if (f.length) h += '<dl class="wx-facts">' + f.map(([k, v]) => '<div><dt>' + k + '</dt><dd>' + v + '</dd></div>').join('') + '</dl>';
+  h += '<p class="wx-tip"><b>What to wear:</b> ' + esc(wxTips(d)) + '</p>';
+  h += '<p class="wx-note">Forecast from Open-Meteo for the city. It can change, and mountain areas like Hakone vary a lot.</p>';
+  return h;
+}
+function wxBlock(date, city){
+  const d = wxDay(date, city);
+  if (!d || !wxNum(d.hi) || !wxNum(d.lo)) return '';
+  const [e, label] = WX_CODES[d.c] || ['🌡️', 'Weather'], open = ui.wxOpen.has(date);
+  return '<button type="button" class="wx" data-wxt="' + esc(date) + '" aria-expanded="' + open + '" aria-label="Weather: ' + esc(label) + ', ' + Math.round(d.lo) + ' to ' + Math.round(d.hi) + ' degrees. Tap for hourly details">'
+    + '<span class="wx-i" aria-hidden="true">' + e + '</span><b>' + esc(label) + '</b>'
+    + '<span>' + wxRange(d.lo, d.hi).replace(/ \(/, ' <span class="f">(').replace(/\)$/, ')</span>') + '</span>'
+    + (wxNum(d.p) && d.p >= 30 ? '<span class="rain">' + Math.round(d.p) + '% rain</span>' : '')
+    + '<span class="more" aria-hidden="true">Tap for details' + icon('chev') + '</span></button>'
+    + '<div class="wxd"' + (open ? '' : ' hidden') + '>' + wxDetail(date, d) + '</div>';
 }
 function fillWeather(){
-  document.querySelectorAll('.wx[data-d]').forEach(el => { const h = wxHtml(el.dataset.d, el.dataset.c); el.innerHTML = h; el.hidden = !h; });
+  document.querySelectorAll('.wxwrap[data-d]').forEach(el => { const h = wxBlock(el.dataset.d, el.dataset.c); el.innerHTML = h; el.hidden = !h; });
 }
-function wxLoadCache(){ const c = lsGet(WX_KEY); if (c && c.v && typeof c.v === 'object'){ wx = c.v; wxAt = Number(c.t) || 0; } }
+function wxLoadCache(){ const c = lsGet(WX_KEY); if (c && c.ver === WX_VER && c.v && typeof c.v === 'object'){ wx = c.v; wxAt = Number(c.t) || 0; } }
 function loadWeather(force){
   if (typeof fetch !== 'function' || !cur || !cur.days) return;
   if (!force && wx && Date.now() - wxAt < 30 * 60000) return;
   const keys = Array.from(new Set(cur.days.map(d => wxCity(d.city)).filter(k => WX_PLACES[k])));
   if (!keys.length) return;
   const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + keys.map(k => WX_PLACES[k][0]).join(',') + '&longitude=' + keys.map(k => WX_PLACES[k][1]).join(',')
-    + '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&past_days=10&forecast_days=16';
+    + '&daily=weather_code,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,uv_index_max,sunrise,sunset'
+    + '&hourly=temperature_2m,weather_code,precipitation_probability,wind_speed_10m&timezone=Asia%2FTokyo&past_days=10&forecast_days=16';
   fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error('weather ' + r.status))).then(j => {
     const list = Array.isArray(j) ? j : [j], out = {};
+    const at = (a, n) => (Array.isArray(a) ? a[n] : undefined);
     keys.forEach((k, i) => {
-      const dd = list[i] && list[i].daily; if (!dd || !Array.isArray(dd.time)) return;
+      const dd = list[i] && list[i].daily, hh = list[i] && list[i].hourly; if (!dd || !Array.isArray(dd.time)) return;
       out[k] = {};
-      dd.time.forEach((t, n) => { out[k][t] = { c: dd.weather_code && dd.weather_code[n], hi: dd.temperature_2m_max && dd.temperature_2m_max[n], lo: dd.temperature_2m_min && dd.temperature_2m_min[n], p: dd.precipitation_probability_max && dd.precipitation_probability_max[n] }; });
+      dd.time.forEach((t, n) => {
+        out[k][t] = { c: at(dd.weather_code, n), hi: at(dd.temperature_2m_max, n), lo: at(dd.temperature_2m_min, n), fh: at(dd.apparent_temperature_max, n), fl: at(dd.apparent_temperature_min, n), p: at(dd.precipitation_probability_max, n), mm: at(dd.precipitation_sum, n), w: at(dd.wind_speed_10m_max, n), uv: at(dd.uv_index_max, n),
+          sr: typeof at(dd.sunrise, n) === 'string' ? dd.sunrise[n].slice(11, 16) : '', ss: typeof at(dd.sunset, n) === 'string' ? dd.sunset[n].slice(11, 16) : '', h: [] };
+      });
+      if (hh && Array.isArray(hh.time)) hh.time.forEach((t, n) => {
+        const day = out[k][t.slice(0, 10)], hr = Number(t.slice(11, 13)), T = at(hh.temperature_2m, n);
+        if (day && hr >= 6 && hr <= 22 && wxNum(T)) day.h.push([hr, Math.round(T * 10) / 10, at(hh.weather_code, n), wxNum(at(hh.precipitation_probability, n)) ? at(hh.precipitation_probability, n) : null, wxNum(at(hh.wind_speed_10m, n)) ? Math.round(at(hh.wind_speed_10m, n)) : null]);
+      });
     });
     if (!Object.keys(out).length){ wxStatus('Weather came back empty.'); return; }
     wx = Object.assign({}, wx || {}, out); wxAt = Date.now();
-    lsSet(WX_KEY, { t: wxAt, v: wx });
+    lsSet(WX_KEY, { t: wxAt, ver: WX_VER, v: wx });
     fillWeather();
     wxStatus('Updated ' + localNow().time + '.');
   }).catch(() => { wxStatus(wx ? 'Couldn\'t refresh just now; showing the last saved forecast.' : 'Couldn\'t load the forecast just now.'); });
 }
 try { document.addEventListener('visibilitychange', () => { if (!document.hidden) loadWeather(); }); } catch(e){}
+
+/* Day map: every stop in a day as one Google Maps route (start, stops in time order, end). Google allows about 9 stops in between, so a long day is split in parts. */
+function stopQuery(it){
+  if (it.type === 'hotel') return it.address ? it.title + ', ' + it.address : [it.title, it.city, 'Japan'].filter(Boolean).join(', ');
+  const name = String(it.title || '').replace(/\s*\([^)]*\)/g, '').trim();
+  if (it.address) return name + ', ' + it.address;
+  if (it.area && it.city) return [name, it.area, it.city, 'Japan'].join(', ');
+  return '';
+}
+function dayStops(d){
+  const out = [], add = (it) => { const q = stopQuery(it); if (q && (!out.length || out[out.length - 1].q !== q)) out.push({ name: it.title, q }); };
+  if (d.checkout) add(d.checkout);
+  d.entries.forEach(e => {
+    const it = e.item;
+    if (e.kind === 'checkin' || e.kind === 'checkout') add(it);
+    else if (e.kind === 'main' && (it.type === 'event' || it.type === 'food') && !(Array.isArray(it.options) && it.options.length && !it.address)) add(it);
+  });
+  if (d.night) add(d.night);
+  return out;
+}
+function dayMapParts(stops){
+  const parts = [];
+  for (let i = 0; i < stops.length - 1; i += 10) parts.push(stops.slice(i, i + 11));
+  return parts;
+}
+function dayMapUrl(part){
+  const mid = part.slice(1, -1).map(x => encodeURIComponent(x.q)).join('%7C');
+  return GMAPS + 'dir/?api=1&origin=' + encodeURIComponent(part[0].q) + '&destination=' + encodeURIComponent(part[part.length - 1].q) + (mid ? '&waypoints=' + mid : '');
+}
+function dayMapHtml(d){
+  const stops = dayStops(d);
+  if (stops.length < 2) return '';
+  const parts = dayMapParts(stops), names = stops.map((x, i) => (i + 1) + '. ' + x.name).join('\n');
+  return '<div class="daymaps">' + parts.map((part, i) => '<a class="daymap" href="' + esc(dayMapUrl(part)) + '" target="_blank" rel="noopener noreferrer" title="' + esc(names) + '" aria-label="' + esc('Map of this day: ' + stops.length + ' stops in Google Maps' + (parts.length > 1 ? ', part ' + (i + 1) + ' of ' + parts.length : '')) + '">'
+    + icon('pin') + '<b>' + (parts.length > 1 ? 'Day map, part ' + (i + 1) + ' of ' + parts.length : 'Day map') + '</b><span>' + (parts.length > 1 ? part.length + ' stops' : stops.length + ' stops') + ' in order</span>'
+    + '<span class="more" aria-hidden="true">Open in Google Maps' + icon('ext') + '</span></a>').join('') + '</div>';
+}
 
 /* ---------- navigation ---------- */
 const TAB_IDS = ['schedule', 'bookings', 'food', 'costs'];
@@ -1692,11 +1825,12 @@ function scrollToToday(){
 
 document.addEventListener('click', ev => {
   if (modalEl && ev.target === modalEl){ closeModal(); return; }
-  const el = ev.target.closest('[data-viewer],[data-past],[data-tab],[data-toggle],[data-copy],[data-jump],[data-add],[data-edit],[data-del],[data-markbooked],[data-city],[data-settings],[data-close],[data-clear-sample]');
+  const el = ev.target.closest('[data-viewer],[data-past],[data-wxt],[data-tab],[data-toggle],[data-copy],[data-jump],[data-add],[data-edit],[data-del],[data-markbooked],[data-city],[data-settings],[data-close],[data-clear-sample]');
   if (!el) return;
   const ds = el.dataset;
   if (ds.viewer !== undefined){ ui.viewer = canonPerson(ds.viewer); lsSet(VIEW_KEY, ui.viewer); ui.open.clear(); rerenderKeepScroll(); return; }
   if ('close' in ds){ closeModal(); return; }
+  if (ds.wxt !== undefined){ const open = !ui.wxOpen.has(ds.wxt); if (open) ui.wxOpen.add(ds.wxt); else ui.wxOpen.delete(ds.wxt); el.setAttribute('aria-expanded', String(open)); const dp = el.parentElement && el.parentElement.querySelector('.wxd'); if (dp){ dp.hidden = !open; const hs = dp.querySelector('.wx-hours'), nw = dp.querySelector('.wx-h.now'); if (open && hs && nw) hs.scrollLeft = Math.max(0, nw.offsetLeft - 70); } return; }
   if ('past' in ds){ ui.showPast = !ui.showPast; renderView(); return; }
   if (ds.copy !== undefined){ copyText(ds.copy, el); return; }
   if (ds.tab){ setTab(ds.tab); return; }
