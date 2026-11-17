@@ -659,9 +659,54 @@ const ICONS = {
   close: SVG_S + '<path d="M6 6l12 12M18 6L6 18"/></svg>',
   info: SVG_S + '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
   chev: SVG_S + '<path d="M6 9l6 6 6-6"/></svg>',
+  castle: SVG_S + '<path d="M4 21h16"/><path d="M6 21v-6h12v6"/><path d="M4 15l8-4 8 4"/><path d="M8 11V8h8v3"/><path d="M6 8l6-4 6 4"/><path d="M11 21v-3h2v3"/></svg>',
+  museum: SVG_S + '<path d="M3 21h18"/><path d="M12 3l9 5H3z"/><path d="M4 9h16"/><path d="M6 9v9M10 9v9M14 9v9M18 9v9"/><path d="M4 18h16"/></svg>',
+  boat: SVG_S + '<path d="M3 15l2 5h14l2-5z"/><path d="M12 15V4"/><path d="M12 5l6 8h-6"/></svg>',
+  bus: SVG_S + '<rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 10h16"/><path d="M8 14.5h.01M16 14.5h.01"/><path d="M7 18v2M17 18v2"/></svg>',
+  beer: SVG_S + '<path d="M6 8h9v11a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M15 11h2a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-2"/><path d="M6 8a3 3 0 0 1 3-3 3 3 0 0 1 5 0 2 2 0 0 1 1 3"/></svg>',
+  chef: SVG_S + '<path d="M7 14a4 4 0 1 1 1.5-7.7A4 4 0 0 1 16 6a4 4 0 1 1 1 8"/><path d="M7 14h10v6H7z"/></svg>',
+  tea: SVG_S + '<path d="M4 10h12v4a6 6 0 0 1-12 0z"/><path d="M16 11h1.5a2.5 2.5 0 0 1 0 5H15"/><path d="M8 3c-1 1 1 2 0 3M12 3c-1 1 1 2 0 3"/></svg>',
+  onsen: SVG_S + '<path d="M4 15c0 3 3.6 5 8 5s8-2 8-5"/><path d="M8 12c-1.2-1.4 1.2-2.6 0-4s0-3 0-3"/><path d="M12 12c-1.2-1.4 1.2-2.6 0-4s0-3 0-3"/><path d="M16 12c-1.2-1.4 1.2-2.6 0-4s0-3 0-3"/></svg>',
+  view: SVG_S + '<circle cx="7" cy="16" r="3.5"/><circle cx="17" cy="16" r="3.5"/><path d="M10.5 16h3"/><path d="M4.5 13.5L7 5h3l.5 7"/><path d="M19.5 13.5L17 5h-3l-.5 7"/></svg>',
+  art: SVG_S + '<path d="M12 3l1.8 4.7 4.7 1.8-4.7 1.8L12 16l-1.8-4.7-4.7-1.8 4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>',
+  paw: SVG_S + '<circle cx="6.5" cy="10" r="1.7"/><circle cx="10" cy="6" r="1.7"/><circle cx="14" cy="6" r="1.7"/><circle cx="17.5" cy="10" r="1.7"/><path d="M8 17.5c0-3 2-5.5 4-5.5s4 2.5 4 5.5c0 1.8-1.8 2.5-4 2.5s-4-.7-4-2.5z"/></svg>',
+  walk: SVG_S + '<circle cx="13" cy="4.5" r="1.8"/><path d="M9 21l2.5-6.5L14 17v4"/><path d="M7.5 12l3-4h3l1.5 3.5 3 1"/><path d="M11.5 14.5l-1-5"/></svg>',
+  tree: SVG_S + '<path d="M12 3l-6 8h4l-4 6h12l-4-6h4z"/><path d="M12 17v4"/></svg>',
+  bridge: SVG_S + '<path d="M2 12h20"/><path d="M4 12c2.5-5 13.5-5 16 0"/><path d="M8 12V9.5M12 12V8.5M16 12V9.5"/><path d="M2 18c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1"/></svg>',
+  scissors: SVG_S + '<circle cx="6" cy="7" r="2.5"/><circle cx="6" cy="17" r="2.5"/><path d="M8 8.5L20 18M8 15.5L20 6"/></svg>',
+  sight: SVG_S + '<path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4l-5.3 3 1.2-6-4.5-4.1 6-.7z"/></svg>',
   refresh: SVG_S + '<path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg>'
 };
 const icon = n => ICONS[n] || '';
+/* Activities get an icon for the kind of place, from their title and Japanese name (first match wins). An item's "icon" field overrides it. */
+const EVENT_KINDS = [
+  ['scissors', 'Appointment', /haircut|hair salon|\bnails?\b/i],
+  ['flight', 'Airport', /airport/i],
+  ['boat', 'Boat', /cruise|\bboat|ferry|遊覧船|御座船/i],
+  ['castle', 'Castle', /castle|城|otemon|sakuramon/i],
+  ['museum', 'Museum', /museum|博物館|美術館|gallery/i],
+  ['bus', 'Tour', /day tour|bus tour|バスツアー/i],
+  ['beer', 'Brewery', /beer|brewery|ビール/i],
+  ['chef', 'Class', /making|cooking class|workshop|体験/i],
+  ['tea', 'Tea', /matcha|\btea\b|七茗園|藤吉/i],
+  ['onsen', 'Hot spring', /onsen|hot spring|温泉|volcanic|大涌谷/i],
+  ['view', 'Viewpoint', /\bsky\b|viewland|observation|viewpoint/i],
+  ['art', 'Art', /teamlab/i],
+  ['paw', 'Animals', /capybara|\bcats?\b|\bowls?\b|hedgehog/i],
+  ['walk', 'Neighbourhood walk', /\bwalk\b|street|district|old town|village|boutiques|neighbou?rhood|dotonbori|^gion\b|sannenzaka|shimokitazawa|sangenjaya|gakugei|ikejiri|hatagaya|kuramae|kiyosumi|yanaka/i],
+  ['event', 'Temple or shrine', /temple|shrine|jingu|jinja|taisha|-ji\b|-dera\b|寺|神社|神宮|大社|堂/i],
+  ['tree', 'Park or nature', /park|garden|bamboo|grove|forest|autumn leaves|deer/i],
+  ['bridge', 'Bridge and river', /bridge|river|橋|川/i],
+];
+function eventKind(it){
+  if (!it || it.type !== 'event') return null;
+  if (it.icon && ICONS[it.icon]) return [it.icon, 'Activity'];
+  const t = (it.title || '') + ' ' + (it.ja || '');
+  for (const k of EVENT_KINDS) if (k[2].test(t)) return [k[0], k[1]];
+  return ['sight', 'Sight'];
+}
+function itemIcon(it){ const k = eventKind(it); return icon(k ? k[0] : it.type); }
+function itemIconLabel(it){ const k = eventKind(it); return k ? k[1] : (TYPE_LABEL[it.type] || ''); }
 
 /* ---------- small helpers ---------- */
 function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]); }
@@ -1121,7 +1166,7 @@ function entryHtml(e, date){
   const showChip = e.kind === 'main' || e.kind === 'checkin';
   return '<li class="entry"' + when + '><div class="row-wrap"><button type="button" class="row" data-toggle="' + esc(key) + '" aria-expanded="' + open + '" aria-controls="d-' + esc(key) + '">'
     + '<span class="t">' + timeHtml + '</span>'
-    + '<span class="ic" title="' + esc(TYPE_LABEL[it.type] || '') + '">' + icon(it.type) + '</span>'
+    + '<span class="ic" title="' + esc(itemIconLabel(it)) + '">' + itemIcon(it) + '</span>'
     + '<span class="what">' + (when ? '<span class="nowtag"></span>' : '') + '<span class="title">' + esc(t.title) + '</span>' + (showChip ? chip(it) : '') + sampleTag(it) + whoTag(it)
     + (t.sub ? '<span class="sub">' + esc(t.sub) + '</span>' : '') + '</span>'
     + '</button>' + pinHtml(it, e.kind, t.title) + '</div><div class="detail" id="d-' + esc(key) + '"' + (open ? '' : ' hidden') + '>' + detailsHtml(it, e.kind) + '</div></li>';
@@ -1268,7 +1313,7 @@ function transitTicket(it){
 function resTicket(it){
   const when = validD(it.date) ? fmtDay(it.date) + (it.time ? ' ' + it.time : '') + (it.endTime ? '–' + it.endTime : '') : 'Date to be set';
   return '<article class="ticket"><div class="tk-main">'
-    + '<div class="tk-eyebrow">' + icon(it.type) + '<span>' + esc([TYPE_LABEL[it.type], it.city].filter(Boolean).join(' · ')) + '</span>' + chip(it) + sampleTag(it) + '</div>'
+    + '<div class="tk-eyebrow">' + itemIcon(it) + '<span>' + esc([TYPE_LABEL[it.type], it.city].filter(Boolean).join(' · ')) + '</span>' + chip(it) + sampleTag(it) + '</div>'
     + '<h3 class="tk-title">' + esc(it.title) + '</h3>'
     + '<div class="tk-times"><span>' + esc(when) + '</span></div>'
     + (it.notes ? '<p class="tk-notes">' + esc(it.notes) + '</p>' : '')

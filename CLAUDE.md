@@ -30,6 +30,7 @@ Each item is one JSON object on its own line:
 | `options` | several choices for one slot (e.g. lunch spots): `[{title, ja, cuisine, area, address, price, notes}]`. Shown as one entry; the dropdown lists each with its own Map button. Set the item's `cuisine` to e.g. `"4 options"` |
 | `cost` | a shared expense, shown in the Costs tab with who owes whom: `{"total": 14800, "paidBy": "Danny", "shares": {"Xin": 2950, …}}` in yen, tax included. Shares must add up to the total; leave `shares` out to split evenly between `who` (or everyone). Never include receipt or card numbers |
 | `lat`, `lng` | optional coordinates to pin a stop exactly. Used by the day map and the Map links instead of the name lookup. Without them the app looks the place up by its `ja` name, title and address, which can miss or land in the wrong spot |
+| `icon` | events only, optional: overrides the automatic icon (picked from the title, e.g. temple, castle, museum, boat, tea, walk). One of `event` (torii), `castle`, `museum`, `boat`, `bus`, `beer`, `chef`, `tea`, `onsen`, `view`, `art`, `paw`, `walk`, `tree`, `bridge`, `scissors`, `sight` |
 | `optionsLabel` | optional heading for the options list, e.g. `"Vegetarian-focused spots nearby"` (default: `"N options"`) |
 
 Day map: each day with 2+ stops has a "Day map" button that opens an in-app map (Leaflet, OpenStreetMap tiles) with numbered pins for its events, meals and hotels in time order, plus a Google Maps route link. Items need an `address`, or an `area` and `city`, to appear.
