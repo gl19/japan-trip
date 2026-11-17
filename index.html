@@ -940,7 +940,7 @@ function tabsHtml(){
 }
 function footHtml(){
   return '<footer class="foot"><p>All times are local to where each thing happens. Japan time is UTC+9 all year, with no daylight saving.</p>'
-    + '<p>Weather is a forecast from Open-Meteo for each day\'s city, shown for the 16 days ahead. It changes, so it updates whenever you open the app.</p>'
+    + '<p>Weather is a forecast from Open-Meteo for each day\'s city, shown for the 16 days ahead. It changes, so it updates whenever you open the app. <span id="wx-status">' + esc(wxNote) + '</span></p>'
     + (ui.canEdit ? '<p>Tip: paste booking confirmation emails to Claude and ask it to add them here.</p>' : '') + '</footer>';
 }
 function viewHtml(){
@@ -1561,7 +1561,8 @@ const WX_KEY = 'jptrip-wx';
 const WX_PLACES = { tokyo:[35.68,139.76], kyoto:[35.01,135.77], osaka:[34.69,135.50], hakone:[35.25,139.02], nara:[34.69,135.80], sendai:[38.27,140.87], hiroshima:[34.39,132.46], kanazawa:[36.56,136.66], nikko:[36.75,139.60], kamakura:[35.32,139.55], sapporo:[43.06,141.35], fukuoka:[33.59,130.40], okinawa:[26.21,127.68] };
 const WX_CODES = {};
 [[[0],'☀️','Clear'],[[1],'🌤️','Mostly clear'],[[2],'⛅','Partly cloudy'],[[3],'☁️','Overcast'],[[45,48],'🌫️','Fog'],[[51,53,55],'🌦️','Drizzle'],[[56,57],'🌧️','Freezing drizzle'],[[61],'🌦️','Light rain'],[[63],'🌧️','Rain'],[[65],'🌧️','Heavy rain'],[[66,67],'🌧️','Freezing rain'],[[71],'🌨️','Light snow'],[[73,77],'🌨️','Snow'],[[75],'❄️','Heavy snow'],[[80],'🌦️','Light showers'],[[81],'🌧️','Showers'],[[82],'⛈️','Heavy showers'],[[85],'🌨️','Snow showers'],[[86],'❄️','Heavy snow showers'],[[95],'⛈️','Thunderstorm'],[[96,99],'⛈️','Thunderstorm with hail']].forEach(([codes, e, l]) => codes.forEach(c => { WX_CODES[c] = [e, l]; }));
-let wx = null, wxAt = 0;
+let wx = null, wxAt = 0, wxNote = '';
+function wxStatus(t){ wxNote = t; const el = document.getElementById('wx-status'); if (el) el.textContent = t; }
 function wxCity(c){ return String(c || '').trim().toLowerCase(); }
 function wxHtml(date, city){
   const d = wx && wx[wxCity(city)] && wx[wxCity(city)][date];
@@ -1591,11 +1592,12 @@ function loadWeather(force){
       out[k] = {};
       dd.time.forEach((t, n) => { out[k][t] = { c: dd.weather_code && dd.weather_code[n], hi: dd.temperature_2m_max && dd.temperature_2m_max[n], lo: dd.temperature_2m_min && dd.temperature_2m_min[n], p: dd.precipitation_probability_max && dd.precipitation_probability_max[n] }; });
     });
-    if (!Object.keys(out).length) return;
+    if (!Object.keys(out).length){ wxStatus('Weather came back empty.'); return; }
     wx = Object.assign({}, wx || {}, out); wxAt = Date.now();
     lsSet(WX_KEY, { t: wxAt, v: wx });
     fillWeather();
-  }).catch(() => {});
+    wxStatus('Updated ' + localNow().time + '.');
+  }).catch(() => { wxStatus(wx ? 'Couldn\'t refresh just now; showing the last saved forecast.' : 'Couldn\'t load the forecast just now.'); });
 }
 try { document.addEventListener('visibilitychange', () => { if (!document.hidden) loadWeather(); }); } catch(e){}
 
