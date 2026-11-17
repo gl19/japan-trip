@@ -348,6 +348,14 @@ body.modal-open{overflow:hidden}
 }
 
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom, 0px));transform:translateX(-50%);z-index:60;width:max-content;max-width:min(460px, calc(100% - 32px));background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+/* Weather */
+.wx{display:flex;align-items:center;flex-wrap:wrap;gap:2px 10px;margin-top:6px;font-size:13.5px;color:var(--muted)}
+.wx[hidden]{display:none}
+.wx .wx-i{font-size:19px;line-height:1}
+.wx b{color:var(--ink);font-weight:600}
+.wx .f{opacity:.8}
+.wx .rain{color:var(--accent);font-weight:600}
+
 /* Now / next */
 .entry{scroll-margin-top:90px}
 .entry.done .row{opacity:.5}
@@ -932,6 +940,7 @@ function tabsHtml(){
 }
 function footHtml(){
   return '<footer class="foot"><p>All times are local to where each thing happens. Japan time is UTC+9 all year, with no daylight saving.</p>'
+    + '<p>Weather is a forecast from Open-Meteo for each day\'s city, shown for the 16 days ahead. It changes, so it updates whenever you open the app.</p>'
     + (ui.canEdit ? '<p>Tip: paste booking confirmation emails to Claude and ask it to add them here.</p>' : '') + '</footer>';
 }
 function viewHtml(){
@@ -1006,6 +1015,7 @@ function dayHtml(d, leg, today){
     + '<div class="day-body"><div class="day-head"><h3>' + esc(fmtDay(d.date)) + '</h3><span class="day-ja" lang="ja">' + esc(fmtDayJa(d.date)) + '</span>'
     + (d.from ? '<span class="travel">' + esc(d.from) + ' → ' + esc(d.city) + '</span>' : '')
     + (isToday ? '<span class="chip today">Today</span>' : '') + '</div>'
+    + '<div class="wx" data-d="' + esc(d.date) + '" data-c="' + esc(d.city || '') + '"' + (wxHtml(d.date, d.city) ? '>' + wxHtml(d.date, d.city) : ' hidden>') + '</div>'
     + (d.night && !hasCheckin ? '<div class="tonight">' + icon('hotel') + '<span>Tonight: ' + esc(d.night.title) + '</span></div>' : '')
     + (d.entries.length ? '<ul class="entries">' + d.entries.map(e => entryHtml(e, d.date)).join('') + '</ul>' : '<p class="free">Nothing planned yet.</p>')
     + '</div></section>';
@@ -1546,6 +1556,49 @@ function viewCosts(){
   return h;
 }
 
+/* Weather: a forecast from Open-Meteo (free, no key) for each day's city, cached in the browser. Days past the 16-day forecast show nothing. */
+const WX_KEY = 'jptrip-wx';
+const WX_PLACES = { tokyo:[35.68,139.76], kyoto:[35.01,135.77], osaka:[34.69,135.50], hakone:[35.25,139.02], nara:[34.69,135.80], sendai:[38.27,140.87], hiroshima:[34.39,132.46], kanazawa:[36.56,136.66], nikko:[36.75,139.60], kamakura:[35.32,139.55], sapporo:[43.06,141.35], fukuoka:[33.59,130.40], okinawa:[26.21,127.68] };
+const WX_CODES = {};
+[[[0],'☀️','Clear'],[[1],'🌤️','Mostly clear'],[[2],'⛅','Partly cloudy'],[[3],'☁️','Overcast'],[[45,48],'🌫️','Fog'],[[51,53,55],'🌦️','Drizzle'],[[56,57],'🌧️','Freezing drizzle'],[[61],'🌦️','Light rain'],[[63],'🌧️','Rain'],[[65],'🌧️','Heavy rain'],[[66,67],'🌧️','Freezing rain'],[[71],'🌨️','Light snow'],[[73,77],'🌨️','Snow'],[[75],'❄️','Heavy snow'],[[80],'🌦️','Light showers'],[[81],'🌧️','Showers'],[[82],'⛈️','Heavy showers'],[[85],'🌨️','Snow showers'],[[86],'❄️','Heavy snow showers'],[[95],'⛈️','Thunderstorm'],[[96,99],'⛈️','Thunderstorm with hail']].forEach(([codes, e, l]) => codes.forEach(c => { WX_CODES[c] = [e, l]; }));
+let wx = null, wxAt = 0;
+function wxCity(c){ return String(c || '').trim().toLowerCase(); }
+function wxHtml(date, city){
+  const d = wx && wx[wxCity(city)] && wx[wxCity(city)][date];
+  if (!d || typeof d.hi !== 'number' || typeof d.lo !== 'number') return '';
+  const [e, label] = WX_CODES[d.c] || ['🌡️', 'Weather'];
+  const f = c => Math.round(c * 9 / 5 + 32);
+  const lo = Math.round(d.lo), hi = Math.round(d.hi);
+  return '<span class="wx-i" aria-hidden="true">' + e + '</span><b>' + esc(label) + '</b>'
+    + '<span>' + lo + '–' + hi + '°C <span class="f">(' + f(d.lo) + '–' + f(d.hi) + '°F)</span></span>'
+    + (typeof d.p === 'number' && d.p >= 30 ? '<span class="rain">' + Math.round(d.p) + '% rain</span>' : '');
+}
+function fillWeather(){
+  document.querySelectorAll('.wx[data-d]').forEach(el => { const h = wxHtml(el.dataset.d, el.dataset.c); el.innerHTML = h; el.hidden = !h; });
+}
+function wxLoadCache(){ const c = lsGet(WX_KEY); if (c && c.v && typeof c.v === 'object'){ wx = c.v; wxAt = Number(c.t) || 0; } }
+function loadWeather(force){
+  if (typeof fetch !== 'function' || !cur || !cur.days) return;
+  if (!force && wx && Date.now() - wxAt < 30 * 60000) return;
+  const keys = Array.from(new Set(cur.days.map(d => wxCity(d.city)).filter(k => WX_PLACES[k])));
+  if (!keys.length) return;
+  const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + keys.map(k => WX_PLACES[k][0]).join(',') + '&longitude=' + keys.map(k => WX_PLACES[k][1]).join(',')
+    + '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Asia%2FTokyo&past_days=10&forecast_days=16';
+  fetch(url).then(r => r.ok ? r.json() : Promise.reject(new Error('weather ' + r.status))).then(j => {
+    const list = Array.isArray(j) ? j : [j], out = {};
+    keys.forEach((k, i) => {
+      const dd = list[i] && list[i].daily; if (!dd || !Array.isArray(dd.time)) return;
+      out[k] = {};
+      dd.time.forEach((t, n) => { out[k][t] = { c: dd.weather_code && dd.weather_code[n], hi: dd.temperature_2m_max && dd.temperature_2m_max[n], lo: dd.temperature_2m_min && dd.temperature_2m_min[n], p: dd.precipitation_probability_max && dd.precipitation_probability_max[n] }; });
+    });
+    if (!Object.keys(out).length) return;
+    wx = Object.assign({}, wx || {}, out); wxAt = Date.now();
+    lsSet(WX_KEY, { t: wxAt, v: wx });
+    fillWeather();
+  }).catch(() => {});
+}
+try { document.addEventListener('visibilitychange', () => { if (!document.hidden) loadWeather(); }); } catch(e){}
+
 /* ---------- navigation ---------- */
 const TAB_IDS = ['schedule', 'bookings', 'food', 'costs'];
 function tabFromHash(){ const h = (location.hash || '').replace('#', ''); return TAB_IDS.includes(h) ? h : ''; }
@@ -1691,8 +1744,10 @@ ui.tab = tabFromHash() || (recent && stash.tab) || keep.tab || 'schedule';
 if (!TAB_IDS.includes(ui.tab)) ui.tab = 'schedule';
 ui.foodCity = (recent && stash.foodCity) || keep.foodCity || 'all';
 ui.viewer = canonPerson(lsGet(VIEW_KEY) || '');
+wxLoadCache();
 if (recent && Array.isArray(stash.open)) stash.open.forEach(k => ui.open.add(k));
 render();
+loadWeather();
 if (recent && typeof stash.y === 'number') requestAnimationFrame(() => window.scrollTo(0, stash.y));
 else if (ui.tab === 'schedule') scrollToToday();
 ssDel(K_UI);

@@ -31,6 +31,8 @@ Each item is one JSON object on its own line:
 | `cost` | a shared expense, shown in the Costs tab with who owes whom: `{"total": 14800, "paidBy": "Danny", "shares": {"Xin": 2950, …}}` in yen, tax included. Shares must add up to the total; leave `shares` out to split evenly between `who` (or everyone). Never include receipt or card numbers |
 | `optionsLabel` | optional heading for the options list, e.g. `"Vegetarian-focused spots nearby"` (default: `"N options"`) |
 
+Weather: each day shows a forecast (conditions, °C and °F, chance of rain) from Open-Meteo for that day's city, up to 16 days ahead. It works for the cities listed in `WX_PLACES` in the app code; add a city's coordinates there if a day's city shows no weather.
+
 No date means it shows under "Ideas" (or the Food tab). Overlapping hotels are fine: the "Plans for" switch at the top filters by `who`, and the Everyone view uses the stay with the most people.
 
 ## Rules
