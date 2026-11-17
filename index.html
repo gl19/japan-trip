@@ -382,14 +382,34 @@ body.modal-open{overflow:hidden}
 .wx-note{margin:0 0 10px;color:var(--muted);font-size:12px}
 
 /* Day map */
-.daymap{display:flex;align-items:center;flex-wrap:wrap;gap:2px 10px;width:100%;margin-top:6px;padding:8px 10px 8px 12px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);color:var(--muted);font-size:13.5px;text-decoration:none}
+.daymap{appearance:none;display:flex;align-items:center;flex-wrap:wrap;gap:2px 10px;width:100%;margin:6px 0 0;padding:8px 10px 8px 12px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);color:var(--muted);font:inherit;font-size:13.5px;text-align:left;cursor:pointer}
 .daymap:hover{border-color:var(--muted)}
 .daymap:focus-visible{outline:2px solid var(--accent);outline-offset:0}
-.daymap svg{width:18px;height:18px;flex:none;color:var(--ink)}
+.daymap > svg{width:18px;height:18px;flex:none;color:var(--ink)}
 .daymap b{color:var(--ink);font-weight:600}
 .daymap .more{margin-left:auto;display:inline-flex;align-items:center;gap:3px;color:var(--accent);font-weight:600;font-size:12.5px;white-space:nowrap}
-.daymap .more svg{width:14px;height:14px;color:inherit}
-.daymaps{display:grid;gap:0}
+.daymap .more svg{width:16px;height:16px;transition:transform .15s}
+.daymap[aria-expanded="true"] .more svg{transform:rotate(180deg)}
+.dmap-panel{margin-top:6px;border:1px solid var(--rule);border-radius:12px;background:var(--surface);overflow:hidden}
+.dmap-panel[hidden]{display:none}
+.dmap{height:280px;background:var(--surface-2);z-index:0}
+.dmap-status{margin:10px 12px 0;font-size:12.5px;color:var(--muted)}
+.dmap-status:empty{display:none}
+.dmap-list{list-style:none;margin:10px 0 0;padding:0 12px;display:grid;gap:4px}
+.dmap-list li{display:flex;align-items:center;gap:8px;min-width:0;font-size:14px}
+.dmap-list button{all:unset;flex:1;min-width:0;cursor:pointer;padding:4px 0;overflow-wrap:anywhere}
+.dmap-list button:focus-visible{outline:2px solid var(--accent)}
+.dmap-list .tm{font-family:var(--font-mono);font-size:12px;color:var(--muted);margin-right:6px}
+.dmap-list a{flex:none;display:inline-flex;align-items:center;gap:3px;color:var(--accent);font-size:12.5px;font-weight:600;text-decoration:none;padding:4px 0}
+.dmap-list a svg{width:13px;height:13px}
+.dmap-list li.miss button{color:var(--muted)}
+.pinno{display:grid;place-items:center;flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:600 12px/1 var(--font-mono);border:2px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.35)}
+li.miss .pinno{background:var(--muted)}
+.pinwrap{background:none;border:0}
+.dmap-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px 12px}
+.dmap-foot p{margin:0;flex:1 1 220px;font-size:12px;color:var(--muted)}
+.leaflet-popup-content{font:14px/1.4 var(--font-body);margin:10px 12px}
+.leaflet-popup-content a{color:var(--accent);font-weight:600}
 
 /* Now / next */
 .entry{scroll-margin-top:90px}
@@ -759,7 +779,7 @@ try { trip = JSON.parse(document.getElementById('trip-data').textContent); } cat
 if (!trip || typeof trip !== 'object') trip = { name: 'Japan trip', start: '', end: '', items: [] };
 if (!Array.isArray(trip.items)) trip.items = [];
 
-const ui = { wxOpen: new Set(), tab: 'schedule', foodCity: 'all', viewer: '', open: new Set(), canEdit: false, readOnly: false, saving: false };
+const ui = { wxOpen: new Set(), mapOpen: new Set(), tab: 'schedule', foodCity: 'all', viewer: '', open: new Set(), canEdit: false, readOnly: false, saving: false };
 let artifactApi = null;
 let cur = { days: [], legs: [], colors: {} };
 
@@ -895,6 +915,7 @@ function render(){
   app.innerHTML = viewerBarHtml() + headerHtml() + noticeHtml() + routeHtml() + '<div id="tabs-anchor"></div>' + tabsHtml() + '<main id="view" role="tabpanel" aria-labelledby="tab-' + ui.tab + '">' + viewHtml() + '</main>' + footHtml();
   updateClock();
   markNow();
+  restoreDayMaps();
 }
 function renderView(){
   const v = document.getElementById('view');
@@ -903,6 +924,7 @@ function renderView(){
   v.setAttribute('aria-labelledby', 'tab-' + ui.tab);
   document.querySelectorAll('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === ui.tab)));
   markNow();
+  restoreDayMaps();
 }
 function rerenderKeepScroll(){ const y = window.scrollY; render(); window.scrollTo(0, y); }
 
@@ -1729,12 +1751,13 @@ function stopQuery(it){
   return '';
 }
 function dayStops(d){
-  const out = [], add = (it) => { const q = stopQuery(it); if (q && (!out.length || out[out.length - 1].q !== q)) out.push({ name: it.title, q }); };
+  const out = [], add = (it, time) => { const q = stopQuery(it); if (q && (!out.length || out[out.length - 1].q !== q)) out.push({ name: it.title, q, it, time: time || '' }); };
   if (d.checkout) add(d.checkout);
   d.entries.forEach(e => {
     const it = e.item;
-    if (e.kind === 'checkin' || e.kind === 'checkout') add(it);
-    else if (e.kind === 'main' && (it.type === 'event' || it.type === 'food') && !(Array.isArray(it.options) && it.options.length && !it.address)) add(it);
+    if (e.kind === 'checkin') add(it, it.time);
+    else if (e.kind === 'checkout') add(it, it.endTime);
+    else if (e.kind === 'main' && (it.type === 'event' || it.type === 'food') && !(Array.isArray(it.options) && it.options.length && !it.address)) add(it, it.time);
   });
   if (d.night) add(d.night);
   return out;
@@ -1751,10 +1774,114 @@ function dayMapUrl(part){
 function dayMapHtml(d){
   const stops = dayStops(d);
   if (stops.length < 2) return '';
-  const parts = dayMapParts(stops), names = stops.map((x, i) => (i + 1) + '. ' + x.name).join('\n');
-  return '<div class="daymaps">' + parts.map((part, i) => '<a class="daymap" href="' + esc(dayMapUrl(part)) + '" target="_blank" rel="noopener noreferrer" title="' + esc(names) + '" aria-label="' + esc('Map of this day: ' + stops.length + ' stops in Google Maps' + (parts.length > 1 ? ', part ' + (i + 1) + ' of ' + parts.length : '')) + '">'
-    + icon('pin') + '<b>' + (parts.length > 1 ? 'Day map, part ' + (i + 1) + ' of ' + parts.length : 'Day map') + '</b><span>' + (parts.length > 1 ? part.length + ' stops' : stops.length + ' stops') + ' in order</span>'
-    + '<span class="more" aria-hidden="true">Open in Google Maps' + icon('ext') + '</span></a>').join('') + '</div>';
+  const open = ui.mapOpen.has(d.date), parts = dayMapParts(stops);
+  return '<button type="button" class="daymap" data-dmap="' + esc(d.date) + '" aria-expanded="' + open + '" aria-label="' + esc('Map of this day with ' + stops.length + ' stops. Tap to show the map') + '">'
+    + icon('pin') + '<b>Day map</b><span>' + stops.length + ' stops, numbered in order</span>'
+    + '<span class="more" aria-hidden="true">Tap to show map' + icon('chev') + '</span></button>'
+    + '<div class="dmap-panel" data-d="' + esc(d.date) + '"' + (open ? '' : ' hidden') + '>'
+    + '<div class="dmap" role="region" aria-label="Map of this day\'s stops"></div><p class="dmap-status"></p>'
+    + '<ol class="dmap-list">' + stops.map((x, i) => '<li data-i="' + i + '"><span class="pinno" aria-hidden="true">' + (i + 1) + '</span><button type="button" data-dpin="' + i + '">' + (x.time ? '<span class="tm">' + esc(x.time) + '</span>' : '') + esc(x.name) + '</button>'
+      + '<a href="' + esc(GMAPS + 'search/?api=1&query=' + encodeURIComponent(x.q)) + '" target="_blank" rel="noopener noreferrer" aria-label="' + esc('Open ' + x.name + ' in Google Maps') + '">Maps' + icon('ext') + '</a></li>').join('') + '</ol>'
+    + '<div class="dmap-foot"><p>Pins are placed automatically from each stop\'s name and address, so check anything that looks off. Tap a pin or a name to see it.</p>'
+    + parts.map((part, i) => '<a class="btn small" href="' + esc(dayMapUrl(part)) + '" target="_blank" rel="noopener noreferrer">' + icon('route') + (parts.length > 1 ? 'Route, part ' + (i + 1) : 'Route in Google Maps') + '</a>').join('') + '</div></div>';
+}
+
+/* The in-app map: Leaflet with OpenStreetMap/CARTO tiles, loaded only when a day map is opened. Stops are found with OpenStreetMap's Nominatim search (one lookup a second, as its rules ask) and cached in the browser. An item can set "lat" and "lng" to fix a pin by hand. */
+const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
+const GEO_KEY = 'jptrip-geo';
+let leafletP = null, geoCache = null, geoBusy = Promise.resolve();
+const dayMaps = {};
+function loadLeaflet(){
+  if (window.L && window.L.map) return Promise.resolve(window.L);
+  if (leafletP) return leafletP;
+  leafletP = new Promise((res, rej) => {
+    const css = document.createElement('link'); css.rel = 'stylesheet'; css.href = LEAFLET + 'leaflet.css'; document.head.appendChild(css);
+    const js = document.createElement('script'); js.src = LEAFLET + 'leaflet.js';
+    js.onload = () => window.L ? res(window.L) : rej(new Error('leaflet'));
+    js.onerror = () => { leafletP = null; rej(new Error('leaflet')); };
+    document.head.appendChild(js);
+  });
+  return leafletP;
+}
+function geoGet(){ if (!geoCache) geoCache = lsGet(GEO_KEY) || {}; return geoCache; }
+function geoQueries(it){
+  const out = [], push = q => { q = String(q || '').trim(); if (q && !out.includes(q)) out.push(q); };
+  const city = String(it.city || '').trim();
+  const cj = city && cityJa(city) ? ' ' + cityJa(city) : '';
+  if (it.ja){ const ja = String(it.ja).replace(/[（(].*$/, '').trim(); push(ja + cj); ja.split('・').slice(1).concat(ja.includes('・') ? [ja.split('・')[0]] : []).forEach(x => push(x.trim() + cj)); }
+  const name = String(it.title || '').replace(/\s*\([^)]*\)/g, '').trim();
+  push(name + (city ? ', ' + city : ''));
+  if (it.address){
+    const a = String(it.address), jp = a.match(/[（(]([^)）]*[぀-鿿][^)）]*)[)）]/);
+    if (jp) push(jp[1].replace(/〒?\d{3}-?\d{4}\s*/, ''));
+    push(a.replace(/\s*[（(].*$/, ''));
+  }
+  return out;
+}
+function geocode(it){
+  if (typeof it.lat === 'number' && typeof it.lng === 'number') return Promise.resolve([it.lat, it.lng]);
+  const cache = geoGet(), qs = geoQueries(it), key = qs.join(' | ');
+  const hit = cache[key];
+  if (Array.isArray(hit)) return Promise.resolve(hit);
+  if (hit && hit.miss && Date.now() - hit.miss < 864e5) return Promise.resolve(null);
+  const c = WX_PLACES[wxCity(it.city)];
+  const box = c ? '&viewbox=' + (c[1] - 0.45) + ',' + (c[0] + 0.45) + ',' + (c[1] + 0.45) + ',' + (c[0] - 0.45) + '&bounded=1' : '';
+  const run = async () => {
+    for (const q of qs){
+      try {
+        const r = await fetch('https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=jp&accept-language=en' + box + '&q=' + encodeURIComponent(q));
+        const j = r.ok ? await r.json() : [];
+        await sleep(1100);
+        if (Array.isArray(j) && j[0] && j[0].lat){ const ll = [Number(j[0].lat), Number(j[0].lon)]; cache[key] = ll; lsSet(GEO_KEY, cache); return ll; }
+      } catch(e){ await sleep(1100); }
+    }
+    cache[key] = { miss: Date.now() }; lsSet(GEO_KEY, cache); return null;
+  };
+  const p = geoBusy.then(run, run);
+  geoBusy = p.catch(() => null);
+  return p;
+}
+function darkTheme(){
+  const t = document.documentElement.getAttribute('data-theme');
+  if (t) return t === 'dark';
+  try { return window.matchMedia('(prefers-color-scheme: dark)').matches; } catch(e){ return false; }
+}
+function openDayMap(panel){
+  const date = panel.dataset.d, d = cur.days.find(x => x.date === date);
+  if (!d) return;
+  const stops = dayStops(d), box = panel.querySelector('.dmap'), status = panel.querySelector('.dmap-status');
+  if (typeof fetch !== 'function') return;
+  status.textContent = 'Loading the map…';
+  loadLeaflet().then(L => {
+    if (!document.contains(box)) return;
+    if (dayMaps[date]){ try { dayMaps[date].map.remove(); } catch(e){} }
+    const center = WX_PLACES[wxCity(d.city)] || [35.0, 135.77];
+    const map = L.map(box, { zoomControl: true, scrollWheelZoom: false, attributionControl: true }).setView(center, 12);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/' + (darkTheme() ? 'dark_all' : 'rastertiles/voyager') + '/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd', attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }).addTo(map);
+    const st = dayMaps[date] = { map, markers: [] };
+    const pts = [];
+    let done = 0, placed = 0;
+    status.textContent = 'Placing ' + stops.length + ' stops…';
+    stops.forEach((x, i) => {
+      geocode(x.it).then(ll => {
+        done++;
+        const li = panel.querySelector('.dmap-list li[data-i="' + i + '"]');
+        if (ll && dayMaps[date] === st){
+          placed++;
+          const m = L.marker(ll, { icon: L.divIcon({ className: 'pinwrap', html: '<span class="pinno">' + (i + 1) + '</span>', iconSize: [24, 24], iconAnchor: [12, 12], popupAnchor: [0, -12] }), title: x.name, zIndexOffset: 100 - i })
+            .bindPopup('<b>' + (i + 1) + '. ' + esc(x.name) + '</b>' + (x.time ? '<br>' + esc(x.time) : '') + '<br><a href="' + esc(GMAPS + 'search/?api=1&query=' + encodeURIComponent(x.q)) + '" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>')
+            .addTo(map);
+          st.markers[i] = m; pts.push(ll);
+          map.fitBounds(L.latLngBounds(pts).pad(0.2), { maxZoom: 16, animate: false });
+        } else if (li) li.classList.add('miss');
+        status.textContent = done < stops.length ? 'Placing stops… ' + done + ' of ' + stops.length : (placed === stops.length ? '' : (stops.length - placed) + ' of ' + stops.length + ' stops couldn\'t be found on the map; their Maps links still work.');
+      });
+    });
+    setTimeout(() => map.invalidateSize(), 50);
+  }).catch(() => { status.textContent = 'The map couldn\'t load just now. The Maps links below still work.'; });
+}
+function restoreDayMaps(){
+  document.querySelectorAll('.dmap-panel[data-d]').forEach(p => { if (!p.hidden) openDayMap(p); });
 }
 
 /* ---------- navigation ---------- */
@@ -1848,12 +1975,14 @@ function scrollToToday(){
 
 document.addEventListener('click', ev => {
   if (modalEl && ev.target === modalEl){ closeModal(); return; }
-  const el = ev.target.closest('[data-viewer],[data-past],[data-wxt],[data-tab],[data-toggle],[data-copy],[data-jump],[data-add],[data-edit],[data-del],[data-markbooked],[data-city],[data-settings],[data-close],[data-clear-sample]');
+  const el = ev.target.closest('[data-viewer],[data-past],[data-wxt],[data-dmap],[data-dpin],[data-tab],[data-toggle],[data-copy],[data-jump],[data-add],[data-edit],[data-del],[data-markbooked],[data-city],[data-settings],[data-close],[data-clear-sample]');
   if (!el) return;
   const ds = el.dataset;
   if (ds.viewer !== undefined){ ui.viewer = canonPerson(ds.viewer); lsSet(VIEW_KEY, ui.viewer); ui.open.clear(); rerenderKeepScroll(); return; }
   if ('close' in ds){ closeModal(); return; }
   if (ds.wxt !== undefined){ const open = !ui.wxOpen.has(ds.wxt); if (open) ui.wxOpen.add(ds.wxt); else ui.wxOpen.delete(ds.wxt); el.setAttribute('aria-expanded', String(open)); const dp = el.parentElement && el.parentElement.querySelector('.wxd'); if (dp){ dp.hidden = !open; const hs = dp.querySelector('.wx-hours'), nw = dp.querySelector('.wx-h.now'); if (open && hs && nw) hs.scrollLeft = Math.max(0, nw.offsetLeft - 70); } return; }
+  if (ds.dmap !== undefined){ const open = !ui.mapOpen.has(ds.dmap); if (open) ui.mapOpen.add(ds.dmap); else ui.mapOpen.delete(ds.dmap); el.setAttribute('aria-expanded', String(open)); const pn = el.nextElementSibling; if (pn && pn.classList.contains('dmap-panel')){ pn.hidden = !open; if (open) openDayMap(pn); } return; }
+  if (ds.dpin !== undefined){ const pn = el.closest('.dmap-panel'), st = pn && dayMaps[pn.dataset.d], m = st && st.markers[Number(ds.dpin)]; if (m){ st.map.setView(m.getLatLng(), Math.max(st.map.getZoom(), 15)); m.openPopup(); pn.querySelector('.dmap').scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' }); } return; }
   if ('past' in ds){ ui.showPast = !ui.showPast; renderView(); return; }
   if (ds.copy !== undefined){ copyText(ds.copy, el); return; }
   if (ds.tab){ setTab(ds.tab); return; }

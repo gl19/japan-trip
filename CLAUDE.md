@@ -29,7 +29,10 @@ Each item is one JSON object on its own line:
 | `by` | `"Claude"` for suggestions Claude added rather than real bookings |
 | `options` | several choices for one slot (e.g. lunch spots): `[{title, ja, cuisine, area, address, price, notes}]`. Shown as one entry; the dropdown lists each with its own Map button. Set the item's `cuisine` to e.g. `"4 options"` |
 | `cost` | a shared expense, shown in the Costs tab with who owes whom: `{"total": 14800, "paidBy": "Danny", "shares": {"Xin": 2950, …}}` in yen, tax included. Shares must add up to the total; leave `shares` out to split evenly between `who` (or everyone). Never include receipt or card numbers |
+| `lat`, `lng` | optional coordinates to pin a stop exactly on the day map. Without them the app looks the place up by its `ja` name, title and address, which can miss or land in the wrong spot |
 | `optionsLabel` | optional heading for the options list, e.g. `"Vegetarian-focused spots nearby"` (default: `"N options"`) |
+
+Day map: each day with 2+ stops has a "Day map" button that opens an in-app map (Leaflet, OpenStreetMap tiles) with numbered pins for its events, meals and hotels in time order, plus a Google Maps route link. Items need an `address`, or an `area` and `city`, to appear.
 
 Weather: each day shows a forecast (conditions, °C and °F, chance of rain) from Open-Meteo for that day's city, up to 16 days ahead. It works for the cities listed in `WX_PLACES` in the app code; add a city's coordinates there if a day's city shows no weather.
 
