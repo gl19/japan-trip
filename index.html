@@ -406,6 +406,7 @@ body.modal-open{overflow:hidden}
 .pinno{display:grid;place-items:center;flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:var(--on-accent);font:600 12px/1 var(--font-mono);border:2px solid var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.35)}
 li.miss .pinno{background:var(--muted)}
 .pinwrap{background:none;border:0}
+.dmap-dark .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9)}
 .dmap-foot{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px 12px}
 .dmap-foot p{margin:0;flex:1 1 220px;font-size:12px;color:var(--muted)}
 .leaflet-popup-content{font:14px/1.4 var(--font-body);margin:10px 12px}
@@ -1786,7 +1787,7 @@ function dayMapHtml(d){
     + parts.map((part, i) => '<a class="btn small" href="' + esc(dayMapUrl(part)) + '" target="_blank" rel="noopener noreferrer">' + icon('route') + (parts.length > 1 ? 'Route, part ' + (i + 1) : 'Route in Google Maps') + '</a>').join('') + '</div></div>';
 }
 
-/* The in-app map: Leaflet with OpenStreetMap/CARTO tiles, loaded only when a day map is opened. Stops are found with OpenStreetMap's Nominatim search (one lookup a second, as its rules ask) and cached in the browser. An item can set "lat" and "lng" to fix a pin by hand. */
+/* The in-app map: Leaflet with OpenStreetMap tiles (no key needed), loaded only when a day map is opened. Stops are found with OpenStreetMap's Nominatim search (one lookup a second, as its rules ask) and cached in the browser. An item can set "lat" and "lng" to fix a pin by hand. */
 const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
 const GEO_KEY = 'jptrip-geo';
 let leafletP = null, geoCache = null, geoBusy = Promise.resolve();
@@ -1857,7 +1858,8 @@ function openDayMap(panel){
     if (dayMaps[date]){ try { dayMaps[date].map.remove(); } catch(e){} }
     const center = WX_PLACES[wxCity(d.city)] || [35.0, 135.77];
     const map = L.map(box, { zoomControl: true, scrollWheelZoom: false, attributionControl: true }).setView(center, 12);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/' + (darkTheme() ? 'dark_all' : 'rastertiles/voyager') + '/{z}/{x}/{y}{r}.png', { maxZoom: 19, subdomains: 'abcd', attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }).addTo(map);
+    box.classList.toggle('dmap-dark', darkTheme());
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(map);
     const st = dayMaps[date] = { map, markers: [] };
     const pts = [];
     let done = 0, placed = 0;
