@@ -1070,7 +1070,7 @@ function tabsHtml(){
 }
 function footHtml(){
   return '<footer class="foot"><p>All times are local to where each thing happens. Japan time is UTC+9 all year, with no daylight saving.</p>'
-    + '<p>Weather is a forecast from Open-Meteo for each day\'s city, shown for the 16 days ahead. It changes, so it updates whenever you open the app. <span id="wx-status">' + esc(wxNote) + '</span></p>'
+    + '<p>Weather is a forecast from Open-Meteo for each day\'s city, shown for the 16 days ahead. It changes, so it updates whenever you open the app. <span id="wx-status">' + esc(wxNote) + '</span> <button type="button" class="linkbtn" data-wxrefresh>Refresh weather now</button></p>'
     + (ui.canEdit ? '<p>Tip: paste booking confirmation emails to Claude and ask it to add them here.</p>' : '') + '</footer>';
 }
 function viewHtml(){
@@ -1740,7 +1740,8 @@ function wxDetail(date, d){
   if (wxNum(d.uv)) f.push(['UV index', Math.round(d.uv) + ' (' + uvLabel(d.uv) + ')']);
   if (f.length) h += '<dl class="wx-facts">' + f.map(([k, v]) => '<div><dt>' + k + '</dt><dd>' + v + '</dd></div>').join('') + '</dl>';
   h += '<p class="wx-tip"><b>What to wear:</b> ' + esc(wxTips(d)) + '</p>';
-  h += '<p class="wx-note">Forecast from Open-Meteo for the city. It can change, and mountain areas like Hakone vary a lot.</p>';
+  const up = wxAt ? new Date(wxAt) : null;
+  h += '<p class="wx-note">Forecast from Open-Meteo for the city' + (up ? ', updated ' + String(up.getHours()).padStart(2, '0') + ':' + String(up.getMinutes()).padStart(2, '0') : '') + '. It can change, and mountain areas like Hakone vary a lot.</p>';
   return h;
 }
 function wxBlock(date, city){
@@ -1760,7 +1761,7 @@ function fillWeather(){
 function wxLoadCache(){ const c = lsGet(WX_KEY); if (c && c.ver === WX_VER && c.v && typeof c.v === 'object'){ wx = c.v; wxAt = Number(c.t) || 0; } }
 function loadWeather(force){
   if (typeof fetch !== 'function' || !cur || !cur.days) return;
-  if (!force && wx && Date.now() - wxAt < 30 * 60000) return;
+  if (!force && wx && Date.now() - wxAt < 15 * 60000) return;
   const keys = Array.from(new Set(cur.days.map(d => wxCity(d.city)).filter(k => WX_PLACES[k])));
   if (!keys.length) return;
   const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + keys.map(k => WX_PLACES[k][0]).join(',') + '&longitude=' + keys.map(k => WX_PLACES[k][1]).join(',')
@@ -2040,11 +2041,12 @@ function scrollToToday(){
 
 document.addEventListener('click', ev => {
   if (modalEl && ev.target === modalEl){ closeModal(); return; }
-  const el = ev.target.closest('[data-viewer],[data-past],[data-wxt],[data-dmap],[data-dpin],[data-tab],[data-toggle],[data-copy],[data-jump],[data-add],[data-edit],[data-del],[data-markbooked],[data-city],[data-settings],[data-close],[data-clear-sample]');
+  const el = ev.target.closest('[data-viewer],[data-past],[data-wxrefresh],[data-wxt],[data-dmap],[data-dpin],[data-tab],[data-toggle],[data-copy],[data-jump],[data-add],[data-edit],[data-del],[data-markbooked],[data-city],[data-settings],[data-close],[data-clear-sample]');
   if (!el) return;
   const ds = el.dataset;
   if (ds.viewer !== undefined){ ui.viewer = canonPerson(ds.viewer); lsSet(VIEW_KEY, ui.viewer); ui.open.clear(); rerenderKeepScroll(); return; }
   if ('close' in ds){ closeModal(); return; }
+  if ('wxrefresh' in ds){ wxStatus('Updating the forecast…'); loadWeather(true); return; }
   if (ds.wxt !== undefined){ const open = !ui.wxOpen.has(ds.wxt); if (open) ui.wxOpen.add(ds.wxt); else ui.wxOpen.delete(ds.wxt); el.setAttribute('aria-expanded', String(open)); const dp = el.parentElement && el.parentElement.querySelector('.wxd'); if (dp){ dp.hidden = !open; const hs = dp.querySelector('.wx-hours'), nw = dp.querySelector('.wx-h.now'); if (open && hs && nw) hs.scrollLeft = Math.max(0, nw.offsetLeft - 70); } return; }
   if (ds.dmap !== undefined){ const open = !ui.mapOpen.has(ds.dmap); if (open) ui.mapOpen.add(ds.dmap); else ui.mapOpen.delete(ds.dmap); el.setAttribute('aria-expanded', String(open)); const pn = el.nextElementSibling; if (pn && pn.classList.contains('dmap-panel')){ pn.hidden = !open; if (open) openDayMap(pn); } return; }
   if (ds.dpin !== undefined){ const pn = el.closest('.dmap-panel'), st = pn && dayMaps[pn.dataset.d], m = st && st.markers[Number(ds.dpin)]; if (m){ st.map.setView(m.getLatLng(), Math.max(st.map.getZoom(), 15)); m.openPopup(); pn.querySelector('.dmap').scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'nearest' }); } return; }
@@ -2145,6 +2147,7 @@ setInterval(() => { updateClock(); if (ui.tab === 'schedule' && ui.schedDay && u
     el.style.opacity = '1'; el.style.transform = 'translate(-50%,0)'; svg.style.transform = '';
     label.textContent = 'Refreshing…';
     stashUi();
+    try { localStorage.removeItem(WX_KEY); } catch(e){}
     setTimeout(() => location.replace(location.pathname + '?r=' + Date.now() + location.hash), 150);
   });
   document.addEventListener('touchcancel', () => { if (!busy) hide(); });
