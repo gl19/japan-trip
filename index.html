@@ -1787,7 +1787,7 @@ function dayMapHtml(d){
     + parts.map((part, i) => '<a class="btn small" href="' + esc(dayMapUrl(part)) + '" target="_blank" rel="noopener noreferrer">' + icon('route') + (parts.length > 1 ? 'Route, part ' + (i + 1) : 'Route in Google Maps') + '</a>').join('') + '</div></div>';
 }
 
-/* The in-app map: Leaflet with OpenStreetMap tiles (no key needed), loaded only when a day map is opened. Stops are found with OpenStreetMap's Nominatim search (one lookup a second, as its rules ask) and cached in the browser. An item can set "lat" and "lng" to fix a pin by hand. */
+/* The in-app map: Leaflet with OpenStreetMap tiles (no key needed), loaded only when a day map is opened. Stops are found with OpenStreetMap's Nominatim search (one lookup a second, as its rules ask), then Photon if that finds nothing, and cached in the browser. An item can set "lat" and "lng" to fix a pin by hand. */
 const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
 const GEO_KEY = 'jptrip-geo';
 let leafletP = null, geoCache = null, geoBusy = Promise.resolve();
@@ -1809,9 +1809,15 @@ function geoQueries(it){
   const out = [], push = q => { q = String(q || '').trim(); if (q && !out.includes(q)) out.push(q); };
   const city = String(it.city || '').trim();
   const cj = city && cityJa(city) ? ' ' + cityJa(city) : '';
-  if (it.ja){ const ja = String(it.ja).replace(/[（(].*$/, '').trim(); push(ja + cj); ja.split('・').slice(1).concat(ja.includes('・') ? [ja.split('・')[0]] : []).forEach(x => push(x.trim() + cj)); }
   const name = String(it.title || '').replace(/\s*\([^)]*\)/g, '').trim();
+  if (it.ja){
+    const ja = String(it.ja).replace(/[（(].*$/, '').trim();
+    push(ja + cj); push(ja);
+    ja.split(/[・\s]+/).filter(x => x.length >= 2).forEach(x => push(x));
+  }
   push(name + (city ? ', ' + city : ''));
+  push(name);
+  if (name.includes(',')) push(name.split(',')[0]);
   if (it.address){
     const a = String(it.address), jp = a.match(/[（(]([^)）]*[぀-鿿][^)）]*)[)）]/);
     if (jp) push(jp[1].replace(/〒?\d{3}-?\d{4}\s*/, ''));
@@ -1835,6 +1841,15 @@ function geocode(it){
         await sleep(1100);
         if (Array.isArray(j) && j[0] && j[0].lat){ const ll = [Number(j[0].lat), Number(j[0].lon)]; cache[key] = ll; lsSet(GEO_KEY, cache); return ll; }
       } catch(e){ await sleep(1100); }
+    }
+    for (const q of qs.slice(0, 4)){
+      try {
+        const r = await fetch('https://photon.komoot.io/api/?limit=1&q=' + encodeURIComponent(q) + (c ? '&bbox=' + (c[1] - 0.45) + ',' + (c[0] - 0.45) + ',' + (c[1] + 0.45) + ',' + (c[0] + 0.45) : ''));
+        const j = r.ok ? await r.json() : null;
+        await sleep(600);
+        const g = j && j.features && j.features[0] && j.features[0].geometry;
+        if (g && Array.isArray(g.coordinates)){ const ll = [Number(g.coordinates[1]), Number(g.coordinates[0])]; cache[key] = ll; lsSet(GEO_KEY, cache); return ll; }
+      } catch(e){ await sleep(600); }
     }
     cache[key] = { miss: Date.now() }; lsSet(GEO_KEY, cache); return null;
   };
