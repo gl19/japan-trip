@@ -1790,7 +1790,7 @@ function loadWeather(force){
     wxStatus('Updated ' + localNow().time + '.');
   }).catch(() => { wxStatus(wx ? 'Couldn\'t refresh just now; showing the last saved forecast.' : 'Couldn\'t load the forecast just now.'); });
 }
-try { document.addEventListener('visibilitychange', () => { if (!document.hidden) loadWeather(); }); } catch(e){}
+try { document.addEventListener('visibilitychange', () => { if (!document.hidden) loadWeather(); }); window.addEventListener('pageshow', () => loadWeather()); window.addEventListener('focus', () => loadWeather()); } catch(e){}
 
 /* Day map: every stop in a day as one Google Maps route (start, stops in time order, end). Google allows about 9 stops in between, so a long day is split in parts. */
 function stopQuery(it){
@@ -2107,7 +2107,7 @@ loadWeather();
 if (recent && typeof stash.y === 'number') requestAnimationFrame(() => window.scrollTo(0, stash.y));
 else if (ui.tab === 'schedule') scrollToToday();
 ssDel(K_UI);
-setInterval(() => { updateClock(); if (ui.tab === 'schedule' && ui.schedDay && ui.schedDay !== localToday()) renderView(); else markNow(); }, 15000);
+setInterval(() => { updateClock(); loadWeather(); if (ui.tab === 'schedule' && ui.schedDay && ui.schedDay !== localToday()) renderView(); else markNow(); }, 15000);
 
 /* Pull down at the top to load a fresh copy. Only in the Home Screen app, which has no built-in pull to refresh. */
 (function pullToRefresh(){
